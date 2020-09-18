@@ -62,6 +62,15 @@
           Next &#62;
         </button>
       </article>
+
+      <!--End Screen-->
+      <article id="endScreen" v-if="screen === 'end'">
+        <img src="@/assets/img/pubnublogo.png" alt="Game Logo" />
+        <h1>Island</h1>
+        <h3>You successfully sent your SOS. Help is on the way!</h3>
+        <h3>Fancy something a little easier? Get started with your <a href="https://www.pubnub.com/docs">first PubNub app!</a></h3>
+        <button @click="quitGame">Play again?</button>
+      </article>
     </main>
   </div>
 </template>
@@ -93,6 +102,9 @@
           this.canProgress = false;
           this.result = null;
         }
+        if (this.currentLevel === this.levels.length) {
+          this.screen = "end";
+        }
       },
       previousLevel: function() {
         this.currentLevel--;
@@ -102,6 +114,7 @@
       quitGame: function() {
         this.currentLevel = 0;
         this.canProgress = false;
+        this.unlockLevel = 0;
         this.screen = "start";
       },
       validateScript: function(script) {
@@ -123,10 +136,14 @@
       let correctAuthToken = generateAuthToken();
       let generateAuthSet = (correct, code) => {
         return {
-          code,
-          operatorA: generateAuthToken(),
-          operatorB: correct ? correctAuthToken : generateAuthToken(),
-          operatorC: generateAuthToken()
+          meta: {
+            code
+          },
+          message: {
+            operatorA: generateAuthToken(),
+            operatorB: correct ? correctAuthToken : generateAuthToken(),
+            operatorC: generateAuthToken()
+          }
         }
       }
       let filterExpression = "LOBSTER";
@@ -160,7 +177,7 @@
         levels: [
           {
             title: "Level 1: Authenticate the system",
-            description: `<p>In order to use the communication system you first need to authenticate.
+            description: `<p>In order to use the communication system you first need to authenticate yourself.
               Pubba the parrot will give you the authentication keys if you can solve his puzzle!<p>`,
             onComplete: `<p>Nice!</p><p>To make your own PubNub keys once you're back to safety, visit
               <a href="https://www.pubnub.com/signup" target="_blank">www.pubnub.com/signup</a> and sign up for for your own free account!</p>`,
@@ -250,9 +267,9 @@
             description: `<p>Success! You can now receive inbound communications! It seems that not all the authorization
               tokens are valid however. It's possible to filter out the invalid codes if you can get Pubba to help.</p>
               <p>Looks like its time for another puzzle!</p>`,
-            onComplete: `To learn how to use filter streaming once you're back to safety, visit
+            onComplete: `Woo! To learn how to PubNub's stream filtering once you're back to safety, visit
               <a href="https://www.pubnub.com/docs" target="_blank">www.pubnub.com/docs</a>!`,
-            onFail: "",
+            onFail: "Hmm that doesn't look right. Your filter expression should be of the form \"code == ANIMAL\"",
             puzzle: {
               question: `<p>Adam and Eve play rock-paper-scissors 10 times. You know that:</p>
                 <ul>
@@ -273,7 +290,7 @@
               initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n});
                 \npubnub.addListener({\n  message: function(msg) {\n    receivedMsg = msg;\n  }\n});
                 \npubnub.subscribe({channels: ['${subscribeChannel}']});`,
-              editableScript: `pubnub.setFilterExpression("");`,
+              editableScript: `pubnub.setFilterExpression("code == ");`,
             },
             testHandler: (script) => {
               window.pubnub = {};
@@ -284,11 +301,15 @@
 
               eval(script);
 
-              return window.pubnub.filterExpression === filterExpression;
+              return window.pubnub.filterExpression === "code == " + filterExpression;
             },
           },
           {
             title: "Level 4: Authorization",
+            description: "TODO", //TODO
+            onComplete: `Great job! To learn how to PubNub's Access Manager once you're back to safety, visit
+              <a href="https://www.pubnub.com/docs" target="_blank">www.pubnub.com/docs</a>!`,
+            onFail: "Hmm that doesn't look right. Only one of the operator's auth tokens are valid. Solve the puzzle to work out which!",
             previousResult: JSON.stringify(filteredAuth, null, 2),
             puzzle: {
               question: `<p>There is an island with cannibals, who always lie, explorers, who always tell the truth and pirates,
@@ -331,6 +352,10 @@
           },
           {
             title: "Level 5: History",
+            description: "TODO", //TODO
+            onComplete: `Good work! To learn how to PubNub's history features once you're back to safety, visit
+              <a href="https://www.pubnub.com/docs" target="_blank">www.pubnub.com/docs</a>!`,
+            onFail: "Hmm that doesn't look right. We need to fetch just one message from the correct channel!",
             puzzle: {
               question: `<p>Susan and Lisa decided to play volleyball against each other.</p>
                 <p>They bet 1 coconut on each game they played.</p>
@@ -354,6 +379,10 @@
           },
           {
             title: "Level 6: Publish",
+            description: "TODO", //TODO
+            onComplete: `Superb! To learn more about to PubNub's realtime publish and subscribe functionality once you're back to safety, visit
+              <a href="https://www.pubnub.com/docs" target="_blank">www.pubnub.com/docs</a>!`,
+            onFail: "Hmm that doesn't look right. You need to publish the island's coordinates to the correct channel. Solve the puzzle and check your formatting!",
             previousResult: JSON.stringify(historyMessage, null, 2),
             puzzle: {
               question: `<p>There are five houses sitting next to each other on a neighborhood street.
@@ -501,23 +530,22 @@
     background-color: #bbb;
   }
 
-  #startScreen {
+  #startScreen, #endScreen {
     padding-top: 30vh;
     text-align: center;
   }
 
-  #startScreen img {
+  #startScreen img, #endScreen img {
     margin: auto;
     display: block;
     max-width: 30%;
   }
 
-  #startScreen button {
+  #startScreen button, #endScreen button {
     margin: 20px 10px;
   }
 
-  #previousButton,
-  #nextButton {
+  #previousButton, #nextButton {
     margin: 20px 0 50px;
   }
 
