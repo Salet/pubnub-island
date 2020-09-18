@@ -117,12 +117,27 @@
     },
     data: function() {
       let generateAuthToken = () => uuidv4().substring(0,10);
-      let subscribeChannel = uuidv4();
       let correctAuthToken = generateAuthToken();
+      let generateAuthSet = (correct, code) => {
+        return {
+          code,
+          operatorA: generateAuthToken(),
+          operatorB: correct ? correctAuthToken : generateAuthToken(),
+          operatorC: generateAuthToken()
+        }
+      }
+      let filterExpression = "LOBSTER";
+      let filteredAuth = generateAuthSet(true, filterExpression);
+      let allAuths = [
+        generateAuthSet(false, "CRAB"),
+        filteredAuth,
+        generateAuthSet(false, "TUNA")
+      ]
+      let subscribeChannel = uuidv4();
       let historyChannel = uuidv4();
       let publishChannel = uuidv4();
-      let filterExpression = "lobster";
-      let coordinates = "37°46'56.2\\\"N 122°23'43.1\\\"W";
+      let coordinates = "37°46'56.2\"N 122°23'43.1\"W";
+      let historyMessage = {dailyReport: "Weather is still hot at " + coordinates + "."};
 
       return {
         screen: "start",
@@ -228,7 +243,7 @@
           },
           {
             title: "Level 3: Filtering messages",
-            previousResult: "ALL AUTH TOKENS{ \"key\": \"value\" }",
+            previousResult: JSON.stringify(allAuths, null, 2),
             description: `<p>Success! You can now receive inbound communications! It seems that not all the authorization
               tokens are valid however. It's possible to filter out the invalid codes if you can get Pubba to help.</p>
               <p>Looks like its time for another puzzle!</p>`,
@@ -271,7 +286,7 @@
           },
           {
             title: "Level 4: Authorization",
-            previousResult: "{ \"operatorA\": \"" + generateAuthToken() + "\",\"operatorB\": \"" + correctAuthToken +"\",\"operatorC\": \"" + generateAuthToken() + "\" }",
+            previousResult: JSON.stringify(filteredAuth, null, 2),
             puzzle: {
               question: `<p>There is an island with cannibals, who always lie, explorers, who always tell the truth and pirates,
                 who can be honest or dishonest.</p>
@@ -336,7 +351,7 @@
           },
           {
             title: "Level 6: Publish",
-            previousResult: "{ \"dailyReport\": \"Weather is still hot at " + coordinates + ".\" }",
+            previousResult: JSON.stringify(historyMessage, null, 2),
             puzzle: {
               question: `<p>There are five houses sitting next to each other on a neighborhood street.
                 Each house's owner is of a different nationality. Each house has different colored walls.

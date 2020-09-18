@@ -29,5 +29,7 @@
     padding: 10px;
     width: 100%;
     resize: none;
+    max-height: 150px;
+    overflow-y: scroll;
   }
 </style>
