@@ -1,7 +1,9 @@
 <template>
   <div class="box">
-    <h3>Help</h3>
-    <p>{{helpText}}</p>
+    <h3>PubNub Island</h3>
+    <div v-html="helpText"></div>
+
+    <button @click="closeHelp()">Close</button>
   </div>
 </template>
 
@@ -9,8 +11,14 @@
   export default {
     name: "Help",
     props: {
-      helpText: String
-    }
+      helpText: String,
+      close: Function
+    },
+    data: function () {
+      return {
+        closeHelp: this.close,
+      };
+    },
   };
 </script>
 

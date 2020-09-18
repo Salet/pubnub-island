@@ -1,13 +1,23 @@
 <template>
   <div class="box">
-    <button>?</button> <!-- TODO Show help screen -->
-    <button @click="currentLevel = 0">X</button> <!-- TODO Quit game -->
+    <button @click="showHelpScreen()">?</button>
+    <button @click="exitGame()">X</button>
   </div>
 </template>
 
 <script>
   export default {
-    name: "Toolbar"
+    name: "Toolbar",
+    props: {
+      showHelp: Function,
+      quitGame: Function,
+    },
+    data: function () {
+      return {
+        showHelpScreen: this.showHelp,
+        exitGame: this.quitGame
+      };
+    },
   };
 </script>
 

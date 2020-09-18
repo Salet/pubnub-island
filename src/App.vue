@@ -2,17 +2,17 @@
   <div id="app">
     <main>
       <!--Toolbar-->
-      <Toolbar v-if="screen !== 'start'" />
+      <Toolbar v-if="screen !== 'start'" :showHelp="() => { this.screen = 'help'; }" :quitGame="quitGame"/>
 
       <!--Start Screen-->
       <article id="startScreen" v-if="screen === 'start'">
-        <img src="@/assets/img/pubnublogo.png" />
-        <button @click="screen = 'help'">Instructions</button>
+        <img src="@/assets/img/pubnublogo.png" alt="Game Logo" />
+        <button @click="screen = 'help'">Help</button>
         <button @click="screen = 'game'">Begin!</button>
       </article>
 
       <!--Instructions-->
-      <Help v-if="screen === 'help'" :helpText="helpText" />
+      <Help v-if="screen === 'help'" :helpText="helpText" :close="() => { this.screen = 'game'; }"/>
 
       <!--Main Game-->
       <article v-if="screen === 'game'">
@@ -21,9 +21,8 @@
           <Puzzle :puzzle="level.puzzle" />
           <Validator :validator="level.validator" />
         </section>
-        <button id="nextButton" v-if="canProgress" @click="nextLevel">
-          Next >
-        </button>
+        <button id="previousButton" v-if="currentLevel > 0" @click="previousLevel">&#60; Previous</button>
+        <button id="nextButton" v-if="canProgress && currentLevel < levels.length" @click="nextLevel">Next &#62;</button>
       </article>
     </main>
   </div>
@@ -50,9 +49,18 @@
         this.currentLevel++;
         this.canProgress = false;
       },
+      previousLevel: function() {
+        this.currentLevel--;
+        this.canProgress = true;
+      },
       handleResult: function(value) {
         value ? this.nextLevel() : alert("Sorry! That's a wrong answer");
       },
+      quitGame: function() {
+        this.currentLevel = 0;
+        this.canProgress = false;
+        this.screen = 'start';
+      }
     },
     computed: {
       level: function() {
@@ -64,11 +72,11 @@
         screen: "start",
         currentLevel: 0,
         canProgress: true,
-        helpText: `You awake, the lone survivor of a shipwreck on a mysterious island. After searching the island you discover a now abandoned communications system. If you can figure out how to work the system you just might be able to signal for help.
+        helpText: `<p>You awake, the lone survivor of a shipwreck on a mysterious island. After searching the island you discover an abandoned communications system. If you can figure out how to work the system you might just be able to signal for help.</p>
 
-         You've got access to the communications handbook but are missing certain configuration parameters. Luckily it seems the old system operators have hidden the necessary configuration through a series of puzzles.
+         <p>You've got access to the communications handbook but are missing certain configuration parameters. Luckily it seems the old system operators have hidden the necessary configuration through a series of puzzles.</p>
 
-         To escape the island you need to crack the puzzles, correctly operate the communications system and broadcast your SOS message!`,
+         <p>To escape the island you need to crack the puzzles, correctly operate the communications system and broadcast your SOS message!</p>`,
         levels: [
           // {
           //   title: "Welcome to PubNub Island!",
@@ -80,7 +88,7 @@
           //     </p><p>At least I think they will...</p>`,
           // },
           {
-            title: "Level 1: Getting your API keys",
+            title: "Level 1: Active the system",
             description: `<p>First thing to do in order to communicate with PubNub is getting your own pair of
             publish/subscribe keys. In order to do that, you would normally go to pubnub.com, sign up for an account and then
             create your own set of keys.</p><p>To make things even simpler, this time I will let you use mine keys.
