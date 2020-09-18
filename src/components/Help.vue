@@ -1,6 +1,6 @@
 <template>
   <div class="box">
-    <h3>PubNub Island</h3>
+    <h1>PubNub Island</h1>
     <div v-html="helpText"></div>
     <section>
       <button @click="closeHelp()">Begin!</button>

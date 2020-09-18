@@ -14,7 +14,7 @@
 
       <!--Start Screen-->
       <article id="startScreen" v-if="screen === 'start'">
-        <img src="@/assets/img/pubnublogo.png" alt="Game Logo"/>
+        <img src="@/assets/img/pubnublogo.png" alt="Game Logo" />
         <h1>Island</h1>
         <button @click="screen = 'help'">Help</button>
         <button @click="screen = 'game'">Begin!</button>
@@ -33,17 +33,24 @@
 
       <!--Main Game-->
       <article v-if="screen === 'game'">
-        <Header :title="level.title" :description="level.description"/>
-        <section v-if="level.validator">
-          <Puzzle :puzzle="level.puzzle"/>
-          <Validator :validator="level.validator"/>
+        <Header :title="level.title" :description="level.description" />
+        <section v-if="level.validator" id="gamearea">
+          <Puzzle :puzzle="level.puzzle" />
+          <Validator :validator="level.validator" />
         </section>
-        <button id="previousButton" v-if="currentLevel > 0" @click="previousLevel">&#60; Previous</button>
+        <button
+          id="previousButton"
+          v-if="currentLevel > 0"
+          @click="previousLevel"
+        >
+          &#60; Previous
+        </button>
         <button
           id="nextButton"
           v-if="currentLevel < levels.length"
           :disabled="!canProgress"
-          @click="nextLevel">
+          @click="nextLevel"
+        >
           Next &#62;
         </button>
       </article>
@@ -124,13 +131,16 @@
             description: `<p>In order to use the communication system you first need to authenticate. Pubba the parrot will give you the authentication keys if you can solve his puzzle!<p>`,
             onComplete: `To make your own PubNub keys once your back to safety, visit <a href="https://www.pubnub.com/signup" target="_blank">www.pubnub.com</a> and sign up for for your own free account!`,
             puzzle: {
-              question: "If five cats can catch five mice in five minutes, how long will it take one cat to catch one mouse?",
+              question:
+                "If five cats can catch five mice in five minutes, how long will it take one cat to catch one mouse?",
               answers: ["1min", "5min", "2min", "10min"],
               solution: "5min",
-              clue: "Your PubNub keyset is demo/demo. Initialize your object on the right with those keys to start working with PubNub right away!",
+              clue:
+                "Your PubNub keyset is demo/demo. Initialize your object on the right with those keys to start working with PubNub right away!",
             },
             validator: {
-              initialScript: `pubnub = new PubNub({\n  publishKey: "",\n  subscribeKey: ""\n})`,
+              initialScript: `import PubNub from 'pubnub';`,
+              editableScript: `pubnub = new PubNub({\n  publishKey: "",\n  subscribeKey: ""\n})`,
               testHandler: (script) => {
                 window.PubNub = function(obj) {
                   this.publishKey = obj.publishKey;
@@ -149,6 +159,11 @@
           },
           {
             title: "Level 2: Subscribing to events",
+            validator: {
+              initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n})`,
+              editableScript: `pubnub.addListener({\n  message: function(msg) { \n    console.log(msg);\n  }\n});`,
+              testHandler: () => {},
+            },
           },
         ],
       };
@@ -225,8 +240,9 @@
     padding: 20px 30px;
   }
 
-  section {
+  #gamearea {
     display: flex;
+    align-items: flex-start;
   }
 
   button {

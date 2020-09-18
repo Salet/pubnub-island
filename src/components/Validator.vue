@@ -1,6 +1,7 @@
 <template>
   <div class="box">
     <h3>Use your new skills here:</h3>
+    <pre v-if="validator.initialScript">{{ validator.initialScript }}</pre>
     <textarea v-model="value"></textarea>
     <button @click="validator.testHandler(value)">Check</button>
   </div>
@@ -12,12 +13,18 @@
     props: {
       validator: {
         initialScript: String,
+        editableScript: String,
         testHandler: Function,
+      },
+    },
+    watch: {
+      validator: function(newValidator) {
+        this.value = newValidator.editableScript;
       },
     },
     data: function() {
       return {
-        value: this.validator.initialScript,
+        value: this.validator.editableScript,
       };
     },
   };
@@ -28,14 +35,25 @@
     width: 60%;
   }
 
+  pre,
   textarea {
-    font-family: "Courier New", Courier, monospace;
+    background: white;
+    border: 1px solid #ccc;
     display: block;
-    width: 100%;
-    height: 250px;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 1rem;
     padding: 10px;
+    width: 100%;
+  }
+
+  pre {
+    margin-bottom: 0;
+    border-bottom: none;
+  }
+
+  textarea {
+    height: 250px;
     resize: none;
-    border-color: #ccc;
   }
 
   button {
