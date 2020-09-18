@@ -3,7 +3,7 @@
     <h1>PubNub Island</h1>
     <div v-html="helpText"></div>
     <section>
-      <button @click="closeHelp()">Begin!</button>
+      <button @click="handleCloseClick">Begin!</button>
     </section>
   </div>
 </template>
@@ -13,12 +13,11 @@
     name: "Help",
     props: {
       helpText: String,
-      close: Function,
     },
-    data: function() {
-      return {
-        closeHelp: this.close,
-      };
+    methods: {
+      handleCloseClick: function() {
+        this.$emit("close");
+      },
     },
   };
 </script>

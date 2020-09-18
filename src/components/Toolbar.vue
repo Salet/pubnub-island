@@ -1,22 +1,20 @@
 <template>
   <div class="box">
-    <button @click="showHelpScreen()">?</button>
-    <button @click="exitGame()">X</button>
+    <button @click="handleHelp">?</button>
+    <button @click="handleExit">X</button>
   </div>
 </template>
 
 <script>
   export default {
     name: "Toolbar",
-    props: {
-      showHelp: Function,
-      quitGame: Function,
-    },
-    data: function () {
-      return {
-        showHelpScreen: this.showHelp,
-        exitGame: this.quitGame
-      };
+    methods: {
+      handleHelp: function() {
+        this.$emit("help");
+      },
+      handleExit: function() {
+        this.$emit("exit");
+      },
     },
   };
 </script>
@@ -28,7 +26,7 @@
     position: absolute;
     top: 0;
     padding: 5px;
-    border-radius: 0px 0px 0px 5px
+    border-radius: 0px 0px 0px 5px;
   }
 
   button {

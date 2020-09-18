@@ -4,12 +4,8 @@
       <!--Toolbar-->
       <Toolbar
         v-if="screen !== 'start'"
-        :showHelp="
-          () => {
-            this.screen = 'help';
-          }
-        "
-        :quitGame="quitGame"
+        @help="screen = 'help'"
+        @exit="quitGame"
       />
 
       <!--Start Screen-->
@@ -24,19 +20,15 @@
       <Help
         v-if="screen === 'help'"
         :helpText="helpText"
-        :close="
-          () => {
-            this.screen = 'game';
-          }
-        "
+        @close="screen = 'game'"
       />
 
       <!--Main Game-->
       <article v-if="screen === 'game'">
         <Header :title="level.title" :description="level.description" />
         <section v-if="level.validator" id="gamearea">
-          <Puzzle :puzzle="level.puzzle" />
-          <Validator :validator="level.validator" />
+          <Puzzle v-if="level.puzzle" :puzzle="level.puzzle" />
+          <Validator v-if="level.validator" :validator="level.validator" />
         </section>
         <button
           id="previousButton"
@@ -111,30 +103,29 @@
         currentLevel: 0,
         unlockLevel: 0,
         canProgress: false,
-        helpText: `<p>You awake, the lone survivor of a shipwreck on a mysterious island. After searching the island you discover an abandoned communications system. If you can figure out how to work the system you might just be able to signal for help.</p>
-
-         <p>You've got access to the communications handbook but are missing certain configuration parameters. Luckily for you a suspiciously fluent parrot seems to have all the necessary configuration you need! Unluckily however the parrot is only willing to reveal his secrets if you can solve his puzzles!</p>
-
-         <p>To escape the island you need to crack the puzzles, correctly operate the communications system and broadcast your SOS message!</p>`,
+        helpText: `<p>You awake, the lone survivor of a shipwreck on a mysterious island.
+          After searching the island you discover an abandoned communications system.
+          If you can figure out how to work the system you might just be able to signal for help.</p>
+          <p>You've got access to the communications handbook but are missing certain configuration
+          parameters. Luckily for you a suspiciously fluent parrot seems to have all the necessary
+          configuration you need! Unluckily however the parrot is only willing to reveal his secrets
+          if you can solve his puzzles!</p>
+          <p>To escape the island you need to crack the puzzles, correctly operate the
+          communications system and broadcast your SOS message!</p>`,
         levels: [
-          // {
-          //   title: "Welcome to PubNub Island!",
-          //   description: `<p>Hello. It looks like you landed on a deserted island of cross-device communication.
-          //     Traditionally, one of the ways to signal your need of help would be through smoke signals.</p>
-          //     <p>Fortunately, nowadays there's a system that might help more easily and with better results: PubNub!</p>
-          //     <p>If you help me to solve some puzzles, I will teach you how to communicate with other people and devices
-          //     through the use of PubNub. This way, someone will receive your message almost immediately and come by to help you!
-          //     </p><p>At least I think they will...</p>`,
-          // },
           {
             title: "Level 1: Authenticate the system",
-            description: `<p>In order to use the communication system you first need to authenticate. Pubba the parrot will give you the authentication keys if you can solve his puzzle!<p>`,
-            onComplete: `To make your own PubNub keys once you're back to safety, visit <a href="https://www.pubnub.com/signup" target="_blank">www.pubnub.com/signup</a> and sign up for for your own free account!`,
+            description: `<p>In order to use the communication system you first need to authenticate.
+              Pubba the parrot will give you the authentication keys if you can solve his puzzle!<p>`,
+            onComplete: `To make your own PubNub keys once you're back to safety, visit
+              <a href="https://www.pubnub.com/signup" target="_blank">www.pubnub.com/signup</a> and sign up for for your own free account!`,
             puzzle: {
-              question: "If five cats can catch five mice in five minutes, how long will it take one cat to catch one mouse?",
+              question:
+                "If five cats can catch five mice in five minutes, how long will it take one cat to catch one mouse?",
               answers: ["1min", "5min", "2min", "10min"],
               solution: "5min",
-              clue: "Your PubNub keyset is demo/demo. Initialize your object on the right with those keys to start working with PubNub right away!",
+              clue:
+                "Your PubNub keyset is demo/demo. Initialize your object on the right with those keys to start working with PubNub right away!",
             },
             validator: {
               initialScript: `pubnub = new PubNub({\n  publishKey: "",\n  subscribeKey: ""\n})`,
@@ -156,9 +147,12 @@
           },
           {
             title: "Level 2: Subscribing to communication channels",
-            description: `<p>Success! You've successfully authenticated yourself. It looks like this system has been secured with access controls however so we will need to authorize in order to broadcast our SOS.</p>
-<p>Pubba tells you that if you subscribe to the correct communication channel you can obtain the islands previous system operators' authorization tokens. He will only tell you the channel to listen on if you can solve his puzzle!<p>`,
-            onComplete: `To learn how to subscribe to your own PubNub channels once you're back to safety, visit <a href="https://www.pubnub.com/docs" target="_blank">www.pubnub.com/docs</a>!`,
+            description: `<p>Success! You've successfully authenticated yourself. It looks like this system has
+            been secured with access controls however so we will need to authorize in order to broadcast our SOS.</p>
+            <p>Pubba tells you that if you subscribe to the correct communication channel you can obtain the islands
+            previous system operators' authorization tokens. He will only tell you the channel to listen on if you can solve his puzzle!<p>`,
+            onComplete: `To learn how to subscribe to your own PubNub channels once you're back to safety,
+              visit <a href="https://www.pubnub.com/docs" target="_blank">www.pubnub.com/docs</a>!`,
             puzzle: {
               question:
                 "If five cats can catch five mice in five minutes, how long will it take one cat to catch one mouse?",
@@ -188,13 +182,18 @@
           },
           {
             title: "Level 3: Filtering messages",
-            description: `<p>Success! You can now receive inbound communications! It seems that not all the authorization tokens are valid however. Its possible to filter out the invalid codes if you can get Pubba to help. Looks like its time for another puzzle!<p>`,
-            onComplete: `To learn how to use filter streaming once you're back to safety, visit <a href="https://www.pubnub.com/docs" target="_blank">www.pubnub.com/docs</a>!`,
+            description: `<p>Success! You can now receive inbound communications! It seems that not all the authorization
+              tokens are valid however. Its possible to filter out the invalid codes if you can get Pubba to help.
+              Looks like its time for another puzzle!<p>`,
+            onComplete: `To learn how to use filter streaming once you're back to safety, visit
+              <a href="https://www.pubnub.com/docs" target="_blank">www.pubnub.com/docs</a>!`,
             puzzle: {
-              question: "If five cats can catch five mice in five minutes, how long will it take one cat to catch one mouse?",
+              question:
+                "If five cats can catch five mice in five minutes, how long will it take one cat to catch one mouse?",
               answers: ["1min", "5min", "2min", "10min"],
               solution: "5min",
-              clue: "Your PubNub keyset is demo/demo. Initialize your object on the right with those keys to start working with PubNub right away!",
+              clue:
+                "Your PubNub keyset is demo/demo. Initialize your object on the right with those keys to start working with PubNub right away!",
             },
             validator: {
               initialScript: `pubnub = new PubNub({\n  publishKey: "",\n  subscribeKey: ""\n})`,
@@ -219,28 +218,25 @@
             validator: {
               initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n})`,
               editableScript: `pubnub.addListener({\n  message: function(msg) { \n    console.log(msg);\n  }\n});`,
-              testHandler: () => {
-              },
-            }
+              testHandler: () => {},
+            },
           },
           {
             title: "Level 5: History",
             validator: {
               initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n})`,
               editableScript: `pubnub.addListener({\n  message: function(msg) { \n    console.log(msg);\n  }\n});`,
-              testHandler: () => {
-              },
-            }
+              testHandler: () => {},
+            },
           },
           {
             title: "Level 6: Publish",
             validator: {
               initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n})`,
               editableScript: `pubnub.addListener({\n  message: function(msg) { \n    console.log(msg);\n  }\n});`,
-              testHandler: () => {
-              },
-            }
-          }
+              testHandler: () => {},
+            },
+          },
         ],
       };
     },
