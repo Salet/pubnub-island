@@ -68,6 +68,7 @@
   import Validator from "./components/Validator.vue";
   import Toolbar from "./components/Toolbar.vue";
   import Help from "./components/Help.vue";
+  import PubNub from "pubnub";
 
   export default {
     name: "App",
@@ -89,14 +90,15 @@
       previousLevel: function() {
         this.currentLevel--;
         this.canProgress = true;
+        this.result = true;
       },
       quitGame: function() {
         this.currentLevel = 0;
         this.canProgress = false;
         this.screen = "start";
       },
-      validateScript: function(script) {
-        this.result = this.level.testHandler(script);
+      validateScript: async function(script) {
+        this.result = await this.level.testHandler(script);
         if (this.result) {
           this.canProgress = true;
           this.unlockLevel === this.currentLevel && this.unlockLevel++;
@@ -111,6 +113,7 @@
     data: function() {
       return {
         screen: "start",
+        pnChannel: "randomize-me",
         currentLevel: 0,
         unlockLevel: 0,
         canProgress: false,
@@ -166,35 +169,38 @@
             previous system operators' authorization tokens. He will only tell you the channel to listen on if you can solve his puzzle!<p>`,
             onComplete: `To learn how to subscribe to your own PubNub channels once you're back to safety,
               visit <a href="https://www.pubnub.com/docs" target="_blank">www.pubnub.com/docs</a>!`,
-            onFail: "",
+            onFail: "Something wrong",
             puzzle: {
-              question:
-                `<p>There are 3 crates in front of you. One contains only coconuts, one contains only bananas. The third crate contains a mixture of coconuts and bananas.</p>
+              question: `<p>There are 3 crates in front of you. One contains only coconuts, one contains only bananas. The third crate contains a mixture of coconuts and bananas.</p>
                 <p>Someone has switched around the labels however so that now none of the crates correctly match their associated label.</p>
                 <p>You can't look inside the crates but can remove one piece of fruit at a time.</p>
                 <p>What is the minimum number of fruits you need to inspect in order to be able to correctly identify all three crates?</p>`,
               answers: ["1", "1 < X < 6", "5 < X < 15", "15 < X"],
               solution: "1",
-              clue:
-                "You need to subscribe to channel x. Use this channel name in the code on the right to start receiving PubNub messages!",
+              clue: `You need to subscribe to channel "randomize-me". Use this channel name in the code on the right to start receiving PubNub messages!`,
             },
             validator: {
               initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n})`,
-              editableScript: `pubnub.addListener({\n  message: function(msg) {\n    console.log(msg);\n  }\n});`,
+              editableScript: `pubnub.addListener({\n  message: function(msg) {\n    receivedMsg = msg;\n  }\n});\n\npubnub.subscribe({channels: ['channel_name']});`,
             },
-            testHandler: (script) => {
-              window.PubNub = function(obj) {
-                this.publishKey = obj.publishKey;
-                this.subscribeKey = obj.subscribeKey;
-              };
-              window.pubnub = {};
-
+            testHandler: async (script) => {
+              window.pubnub = new PubNub({
+                publishKey: "demo",
+                subscribeKey: "demo",
+              });
+              window.receivedMsg = { message: "" };
+              const msgText = "SOS";
               eval(script);
 
-              return (
-                window.pubnub.publishKey === "demo" &&
-                window.pubnub.subscribeKey === "demo"
+              await window.pubnub.publish({
+                channel: this.pnChannel,
+                message: msgText,
+              });
+              console.log(
+                "Debug ---- window.receivedMsg is: ",
+                window.receivedMsg
               );
+              return window.receivedMsg.message === msgText;
             },
           },
           {
@@ -206,8 +212,7 @@
               <a href="https://www.pubnub.com/docs" target="_blank">www.pubnub.com/docs</a>!`,
             onFail: "",
             puzzle: {
-              question:
-                `<p>Adam and Eve play rock-paper-scissors 10 times. You know that:</p>
+              question: `<p>Adam and Eve play rock-paper-scissors 10 times. You know that:</p>
                 <ul>
                   <li>Adam uses rock three times, scissors six times, and paper once.</li>
                   <li>Eve uses rock twice, scissors four times, and paper four times.</li>
@@ -218,7 +223,7 @@
               answers: ["Adam 6-4", "Eve 6-4", "Adam 7-3", "Eve 7-3"],
               solution: "Adam 7-3",
               clue:
-                "The filter expression you need is \"lobster\". Filter PubNub messages in your code on the right with this expression!",
+                'The filter expression you need is "lobster". Filter PubNub messages in your code on the right with this expression!',
             },
             validator: {
               initialScript: `pubnub = new PubNub({\n  publishKey: "",\n  subscribeKey: ""\n})`,
@@ -241,8 +246,7 @@
           {
             title: "Level 4: Authorization",
             puzzle: {
-              question:
-                `<p>There is an island with cannibals, who always lie, explorers, who always tell the truth and pirates, who can be honest or dishonest.</p>
+              question: `<p>There is an island with cannibals, who always lie, explorers, who always tell the truth and pirates, who can be honest or dishonest.</p>
                 <p>On the island you are approached by three men. One wears blue, one wears red, and one wears green.</p>
                 <p>You know that one is a cannibal, one is an explorer and the other one is a pirate.</p>
                 <p>The man in red says, "I am a cannibal."</p>
@@ -263,8 +267,7 @@
           {
             title: "Level 5: History",
             puzzle: {
-              question:
-                `<p>Susan and Lisa decided to play volleyball against each other.</p>
+              question: `<p>Susan and Lisa decided to play volleyball against each other.</p>
                 <p>They bet 1 coconut on each game they played.</p>
                 <p>Susan won three bets and Lisa walked away with 5 more coconuts than when they had started.</p>
                 <p>How many games did they play?</p>`,
@@ -282,8 +285,7 @@
           {
             title: "Level 6: Publish",
             puzzle: {
-              question:
-                `<p>There are five houses sitting next to each other on a neighborhood street. Each house's owner is of a different nationality. Each house has different colored walls. Each house's owner drinks their own specific beverage, smokes their own brand of cigar, and keeps a certain type of pet. None of the houses share any of these variables—nationality, wall color, beverage, cigar, and pet—they are all unique.</p><ul>
+              question: `<p>There are five houses sitting next to each other on a neighborhood street. Each house's owner is of a different nationality. Each house has different colored walls. Each house's owner drinks their own specific beverage, smokes their own brand of cigar, and keeps a certain type of pet. None of the houses share any of these variables—nationality, wall color, beverage, cigar, and pet—they are all unique.</p><ul>
                 <ul>
                   <li>The Englishman lives in the house with red walls.The Swede keeps dogs.</ul>li>
                   <li>The Dane drinks tea.</li>
