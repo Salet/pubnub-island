@@ -2,7 +2,7 @@
   <div class="box">
     <img src="@/assets/img/parrot.svg" />
     <h1>{{ title }}</h1>
-    <div v-html="description"></div>
+    <div v-html="description" />
   </div>
 </template>
 

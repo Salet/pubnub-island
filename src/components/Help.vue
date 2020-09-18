@@ -1,7 +1,7 @@
 <template>
   <div class="box">
     <h1>PubNub Island</h1>
-    <div v-html="helpText"></div>
+    <div v-html="helpText" />
     <section>
       <button @click="handleCloseClick">Begin!</button>
     </section>

@@ -95,11 +95,11 @@ Answer: 5
 
 There are 3 crates in front of you. One contains only apples, one contains only oranges. The third crate contains a mixture of apples and oranges.
 
-Someone has switched around the labels however so now none of the crates correctly match their associated label.
+Someone has switched around the labels however so that now none of the crates correctly match their associated label.
 
 You can't look inside the crates but can remove one piece of fruit at a time.
 
-What is the minimum number of fruits you need to inspect to be able to correctly identify all three crates?
+What is the minimum number of fruits you need to inspect in order to be able to correctly identify all three crates?
 
 This number is the channel that you need to use.
 

@@ -136,7 +136,7 @@
             puzzle: {
               question:
                 "If five cats can catch five mice in five minutes, how long will it take one cat to catch one mouse?",
-              answers: ["1min", "5min", "2min", "10min"],
+              answers: ["1min", "5min", "10min", "25min"],
               solution: "5min",
               clue:
                 "Your PubNub keyset is demo/demo. Initialize your object with those keys to start working with PubNub right away!",
@@ -169,11 +169,14 @@
             onFail: "",
             puzzle: {
               question:
-                "If five cats can catch five mice in five minutes, how long will it take one cat to catch one mouse?",
-              answers: ["1min", "5min", "2min", "10min"],
-              solution: "5min",
+                `<p>There are 3 crates in front of you. One contains only coconuts, one contains only bananas. The third crate contains a mixture of coconuts and bananas.</p>
+                <p>Someone has switched around the labels however so that now none of the crates correctly match their associated label.</p>
+                <p>You can't look inside the crates but can remove one piece of fruit at a time.</p>
+                <p>What is the minimum number of fruits you need to inspect in order to be able to correctly identify all three crates?</p>`,
+              answers: ["1", "1 < X < 6", "5 < X < 15", "15 < X"],
+              solution: "1",
               clue:
-                "Your PubNub keyset is demo/demo. Initialize your object on the right with those keys to start working with PubNub right away!",
+                "You need to subscribe to channel x. Use this channel name in the code on the right to start receiving PubNub messages!",
             },
             validator: {
               initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n})`,
@@ -197,18 +200,25 @@
           {
             title: "Level 3: Filtering messages",
             description: `<p>Success! You can now receive inbound communications! It seems that not all the authorization
-              tokens are valid however. Its possible to filter out the invalid codes if you can get Pubba to help.
-              Looks like its time for another puzzle!<p>`,
+              tokens are valid however. It's possible to filter out the invalid codes if you can get Pubba to help.</p>
+              <p>Looks like its time for another puzzle!</p>`,
             onComplete: `To learn how to use filter streaming once you're back to safety, visit
               <a href="https://www.pubnub.com/docs" target="_blank">www.pubnub.com/docs</a>!`,
             onFail: "",
             puzzle: {
               question:
-                "If five cats can catch five mice in five minutes, how long will it take one cat to catch one mouse?",
-              answers: ["1min", "5min", "2min", "10min"],
-              solution: "5min",
+                `<p>Adam and Eve play rock-paper-scissors 10 times. You know that:</p>
+                <ul>
+                  <li>Adam uses rock three times, scissors six times, and paper once.</li>
+                  <li>Eve uses rock twice, scissors four times, and paper four times.</li>
+                  <li>There are no ties in all 10 games.</li>
+                  <li>The order of games is unknown.</li>
+                </ul>
+                <p>"Who wins? By how much?</p>`,
+              answers: ["Adam 6-4", "Eve 6-4", "Adam 7-3", "Eve 7-3"],
+              solution: "Adam 7-3",
               clue:
-                "Your PubNub keyset is demo/demo. Initialize your object on the right with those keys to start working with PubNub right away!",
+                "The filter expression you need is \"lobster\". Filter PubNub messages in your code on the right with this expression!",
             },
             validator: {
               initialScript: `pubnub = new PubNub({\n  publishKey: "",\n  subscribeKey: ""\n})`,
@@ -230,6 +240,20 @@
           },
           {
             title: "Level 4: Authorization",
+            puzzle: {
+              question:
+                `<p>There is an island with cannibals, who always lie, explorers, who always tell the truth and pirates, who can be honest or dishonest.</p>
+                <p>On the island you are approached by three men. One wears blue, one wears red, and one wears green.</p>
+                <p>You know that one is a cannibal, one is an explorer and the other one is a pirate.</p>
+                <p>The man in red says, "I am a cannibal."</p>
+                <p>The man in blue says, "I am not a pirate."</p>
+                <p>The man in green says, "If you asked me, I would say that the man in red is the pirate."</p>
+                <p>What are the true identities of these three men?</p>`,
+              answers: ["Red: Pirate, Blue: Explorer, Green: Cannibal"],
+              solution: "Red: Pirate, Blue: Explorer, Green: Cannibal",
+              clue:
+                "You need to use the authorization token for operator B. Provide the correct auth token in your code on the right to apply the correct authorization permissions to your PubNub client!",
+            },
             validator: {
               initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n})`,
               editableScript: `pubnub.addListener({\n  message: function(msg) { \n    console.log(msg);\n  }\n});`,
@@ -238,6 +262,17 @@
           },
           {
             title: "Level 5: History",
+            puzzle: {
+              question:
+                `<p>Susan and Lisa decided to play volleyball against each other.</p>
+                <p>They bet 1 coconut on each game they played.</p>
+                <p>Susan won three bets and Lisa walked away with 5 more coconuts than when they had started.</p>
+                <p>How many games did they play?</p>`,
+              answers: ["5", "8", "11", "15"],
+              solution: "11",
+              clue:
+                "The channel you need to retrieve history from is channel z. Fetch historical PubNub messages in your code on the right using this channel name!",
+            },
             validator: {
               initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n})`,
               editableScript: `pubnub.addListener({\n  message: function(msg) { \n    console.log(msg);\n  }\n});`,
@@ -246,6 +281,31 @@
           },
           {
             title: "Level 6: Publish",
+            puzzle: {
+              question:
+                `<p>There are five houses sitting next to each other on a neighborhood street. Each house's owner is of a different nationality. Each house has different colored walls. Each house's owner drinks their own specific beverage, smokes their own brand of cigar, and keeps a certain type of pet. None of the houses share any of these variables—nationality, wall color, beverage, cigar, and pet—they are all unique.</p><ul>
+                <ul>
+                  <li>The Englishman lives in the house with red walls.The Swede keeps dogs.</ul>li>
+                  <li>The Dane drinks tea.</li>
+                  <li>The house with green walls is just to the left of the house with white walls.</li>
+                  <li>The owner of the house with green walls drinks coffee.</li>
+                  <li>The man who smokes Pall Mall keeps birds.</li>
+                  <li>The owner of the house with yellow walls smokes Dunhills.</li>
+                  <li>The man in the center house drinks milk.</li>
+                  <li>The Norwegian lives in the first house.</li>
+                  <li>The Blend smoker has a neighbor who keeps cats.</li>
+                  <li>The man who smokes Blue Masters drinks beer.</li>
+                  <li>The man who keeps horses lives next to the Dunhill smoker.</li>
+                  <li>The German smokes Prince.</li>
+                  <li>The Norwegian lives next to the house with blue walls.</li>
+                  <li>The Blend smoker has a neighbor who drinks water.</li>
+                </ul>
+                <p>One of the house owners keeps fish, who is it?</p>`,
+              answers: ["House 1", "House 2", "House 3", "House 4", "House 5"],
+              solution: "House 4",
+              clue:
+                "You need to publish your SOS to channel y. Publish your first PubNub message containing the island coordinates to this channel in your code on the right!",
+            },
             validator: {
               initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n})`,
               editableScript: `pubnub.addListener({\n  message: function(msg) { \n    console.log(msg);\n  }\n});`,

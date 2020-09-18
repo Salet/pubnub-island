@@ -1,7 +1,7 @@
 <template>
   <div class="box">
     <h3>Your quest:</h3>
-    <p>{{ puzzle.question }}</p>
+    <p v-html="puzzle.question" />
 
     <section>
       <button
