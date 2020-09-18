@@ -14,7 +14,7 @@
 
       <!--Start Screen-->
       <article id="startScreen" v-if="screen === 'start'">
-        <img src="@/assets/img/pubnublogo.png" alt="Game Logo" />
+        <img src="@/assets/img/pubnublogo.png" alt="Game Logo"/>
         <h1>Island</h1>
         <button @click="screen = 'help'">Help</button>
         <button @click="screen = 'game'">Begin!</button>
@@ -33,23 +33,17 @@
 
       <!--Main Game-->
       <article v-if="screen === 'game'">
-        <Header :title="level.title" :description="level.description" />
+        <Header :title="level.title" :description="level.description"/>
         <section v-if="level.validator">
-          <Puzzle :puzzle="level.puzzle" />
-          <Validator :validator="level.validator" />
+          <Puzzle :puzzle="level.puzzle"/>
+          <Validator :validator="level.validator"/>
         </section>
-        <button
-          id="previousButton"
-          v-if="currentLevel > 0"
-          @click="previousLevel"
-        >
-          &#60; Previous
-        </button>
+        <button id="previousButton" v-if="currentLevel > 0" @click="previousLevel">&#60; Previous</button>
         <button
           id="nextButton"
-          v-if="canProgress && currentLevel < levels.length"
-          @click="nextLevel"
-        >
+          v-if="currentLevel < levels.length"
+          :disabled="!canProgress"
+          @click="nextLevel">
           Next &#62;
         </button>
       </article>
@@ -76,14 +70,22 @@
     methods: {
       nextLevel: function() {
         this.currentLevel++;
-        this.canProgress = false;
+        if (this.currentLevel === this.unlockLevel) {
+          this.canProgress = false;
+        }
       },
       previousLevel: function() {
         this.currentLevel--;
         this.canProgress = true;
       },
       handleResult: function(value) {
-        value ? this.nextLevel() : alert("Sorry! That's a wrong answer");
+        if (value) {
+          this.canProgress = true;
+          this.unlockLevel++;
+          alert(this.level.onComplete);
+        } else {
+          alert("Sorry! That's a wrong answer");
+        }
       },
       quitGame: function() {
         this.currentLevel = 0;
@@ -100,10 +102,11 @@
       return {
         screen: "start",
         currentLevel: 0,
-        canProgress: true,
+        unlockLevel: 0,
+        canProgress: false,
         helpText: `<p>You awake, the lone survivor of a shipwreck on a mysterious island. After searching the island you discover an abandoned communications system. If you can figure out how to work the system you might just be able to signal for help.</p>
 
-         <p>You've got access to the communications handbook but are missing certain configuration parameters. Luckily it seems the old system operators have hidden the necessary configuration through a series of puzzles.</p>
+         <p>You've got access to the communications handbook but are missing certain configuration parameters. Luckily for you a suspiciously fluent parrot seems to have all the necessary configuration you need! Unluckily however the parrot is only willing to reveal his secrets if you can solve his puzzles!</p>
 
          <p>To escape the island you need to crack the puzzles, correctly operate the communications system and broadcast your SOS message!</p>`,
         levels: [
@@ -118,17 +121,13 @@
           // },
           {
             title: "Level 1: Active the system",
-            description: `<p>First thing to do in order to communicate with PubNub is getting your own pair of
-            publish/subscribe keys. In order to do that, you would normally go to pubnub.com, sign up for an account and then
-            create your own set of keys.</p><p>To make things even simpler, this time I will let you use mine keys.
-            But first, a puzzle!`,
+            description: `<p>In order to use the communication system you first need to authenticate. Pubba the parrot will give you the authentication keys if you can solve his puzzle!<p>`,
+            onComplete: `To make your own PubNub keys once your back to safety, visit <a href="https://www.pubnub.com/signup" target="_blank">www.pubnub.com</a> and sign up for for your own free account!`,
             puzzle: {
-              question:
-                "If five cats can catch five mice in five minutes, how long will it take one cat to catch one mouse?",
+              question: "If five cats can catch five mice in five minutes, how long will it take one cat to catch one mouse?",
               answers: ["1min", "5min", "2min", "10min"],
               solution: "5min",
-              clue:
-                "Your PubNub keyset is demo/demo. Initialize your object on the right with those keys to start working with PubNub right away!",
+              clue: "Your PubNub keyset is demo/demo. Initialize your object on the right with those keys to start working with PubNub right away!",
             },
             validator: {
               initialScript: `pubnub = new PubNub({\n  publishKey: "",\n  subscribeKey: ""\n})`,
@@ -240,6 +239,10 @@
     margin-top: 0px;
   }
 
+  button:hover {
+    background-color: rgb(255 134 129);
+  }
+
   #startScreen {
     padding-top: 30vh;
     text-align: center;
@@ -262,5 +265,12 @@
 
   #nextButton {
     float: right;
+    margin-top: 20px;
+  }
+
+  #nextButton:disabled {
+    background-color: rgb(145 136 135);
+    color: #bebebe;
+    cursor: default;
   }
 </style>
