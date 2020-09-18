@@ -26,7 +26,10 @@
       <!--Main Game-->
       <article v-if="screen === 'game'">
         <Header :title="level.title" :description="level.description" />
-        <IncomingMessage v-if="level.previousResult" :incomingMessages="level.previousResult"/>
+        <IncomingMessage
+          v-if="level.previousResult"
+          :incomingMessages="level.previousResult"
+        />
         <section v-if="level.validator" id="gamearea">
           <Puzzle v-if="level.puzzle" :puzzle="level.puzzle" />
           <Validator
@@ -116,7 +119,7 @@
       },
     },
     data: function() {
-      let generateAuthToken = () => uuidv4().substring(0,10);
+      let generateAuthToken = () => uuidv4().substring(0, 10);
       let correctAuthToken = generateAuthToken();
       let generateAuthSet = (correct, code) => {
         return {
@@ -142,8 +145,8 @@
       return {
         screen: "start",
         currentLevel: 0,
-        unlockLevel: 10,
-        canProgress: true,
+        unlockLevel: 0,
+        canProgress: false,
         result: null,
         helpText: `<p>You awake, the lone survivor of a shipwreck on a mysterious island.
           After searching the island you discover an abandoned communications system.
@@ -267,9 +270,9 @@
                 '". Filter PubNub messages in your code on the right with this expression!',
             },
             validator: {
-              initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n
-                  });\n\npubnub.addListener({\n  message: function(msg) {\n    receivedMsg = msg;\n  }\n
-                  });\n\npubnub.subscribe({channels: ['${subscribeChannel}']});`,
+              initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n});
+                \npubnub.addListener({\n  message: function(msg) {\n    receivedMsg = msg;\n  }\n});
+                \npubnub.subscribe({channels: ['${subscribeChannel}']});`,
               editableScript: `pubnub.setFilterExpression("");`,
             },
             testHandler: (script) => {

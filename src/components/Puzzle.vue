@@ -46,6 +46,11 @@
         waiting: false,
       };
     },
+    watch: {
+      puzzle: function() {
+        this.correct = false;
+      },
+    },
     methods: {
       checkAnswer: function(answer) {
         this.correct = answer === this.puzzle.solution;

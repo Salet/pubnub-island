@@ -1,13 +1,13 @@
 <template>
   <div class="box">
     <h3>Incoming Messages!</h3>
-    <pre>{{incomingMessages}}</pre>
+    <pre>{{ incomingMessages }}</pre>
   </div>
 </template>
 
 <script>
   export default {
-    name: "Incoming Messages",
+    name: "IncomingMessage",
     props: {
       incomingMessages: String,
     },
