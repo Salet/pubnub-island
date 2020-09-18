@@ -8,7 +8,7 @@
         v-for="answer in puzzle.answers"
         :key="answer"
         @click="checkAnswer(answer)"
-        :disabled="waiting"
+        :disabled="waiting || correct"
       >
         {{ answer }}
       </button>
