@@ -97,12 +97,13 @@
         this.canProgress = false;
         this.screen = "start";
       },
-      validateScript: async function(script) {
-        this.result = await this.level.testHandler(script);
-        if (this.result) {
-          this.canProgress = true;
-          this.unlockLevel === this.currentLevel && this.unlockLevel++;
-        }
+      validateScript: function(script) {
+        this.result = this.level.testHandler(script);
+        if (this.result) this.enableNextLevel();
+      },
+      enableNextLevel: function() {
+        this.canProgress = true;
+        this.unlockLevel === this.currentLevel && this.unlockLevel++;
       },
     },
     computed: {
@@ -169,7 +170,8 @@
             previous system operators' authorization tokens. He will only tell you the channel to listen on if you can solve his puzzle!<p>`,
             onComplete: `To learn how to subscribe to your own PubNub channels once you're back to safety,
               visit <a href="https://www.pubnub.com/docs" target="_blank">www.pubnub.com/docs</a>!`,
-            onFail: "Something wrong",
+            onFail:
+              "Something went wrong as your listener haven't received our message. Perhaps you subscribed to a wrong channel?",
             puzzle: {
               question: `<p>There are 3 crates in front of you. One contains only coconuts, one contains only bananas. The third crate contains a mixture of coconuts and bananas.</p>
                 <p>Someone has switched around the labels however so that now none of the crates correctly match their associated label.</p>
@@ -180,27 +182,35 @@
               clue: `You need to subscribe to channel "randomize-me". Use this channel name in the code on the right to start receiving PubNub messages!`,
             },
             validator: {
-              initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n})`,
-              editableScript: `pubnub.addListener({\n  message: function(msg) {\n    receivedMsg = msg;\n  }\n});\n\npubnub.subscribe({channels: ['channel_name']});`,
+              initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n})
+                \n\npubnub.addListener({\n  message: function(msg) {\n    // handle incoming messages in a listener\n  }\n});`,
+              editableScript: `pubnub.subscribe({channels: ['channel_name']});`,
             },
-            testHandler: async (script) => {
+            // this particular handler might blink with an incorrect result message for a bit even for good answers
+            // that's because it always returns false and the actual result is corrected when a message is received
+            testHandler: (script) => {
+              const msgText = "SOS";
+              window.receivedMsg = { message: "" };
               window.pubnub = new PubNub({
                 publishKey: "demo",
                 subscribeKey: "demo",
+                uuid: "demo",
               });
-              window.receivedMsg = { message: "" };
-              const msgText = "SOS";
+              window.pubnub.addListener({
+                message: (msg) => {
+                  this.result = msg.message === msgText;
+                  if (this.result) this.enableNextLevel();
+                },
+              });
+              // .subscribe call comes from the code editor
               eval(script);
 
-              await window.pubnub.publish({
+              window.pubnub.publish({
                 channel: this.pnChannel,
                 message: msgText,
               });
-              console.log(
-                "Debug ---- window.receivedMsg is: ",
-                window.receivedMsg
-              );
-              return window.receivedMsg.message === msgText;
+
+              return false;
             },
           },
           {
@@ -358,7 +368,7 @@
     scroll-behavior: smooth;
     text-rendering: optimizeSpeed;
     line-height: 1.5;
-    font-size: 20px;
+    font-size: 18px;
     padding-top: 50px;
   }
 
@@ -379,7 +389,7 @@
 
   main {
     margin: 0px auto;
-    max-width: 1200px;
+    max-width: 1400px;
     text-align: left;
   }
 
@@ -416,6 +426,11 @@
     background-color: rgb(255 134 129);
   }
 
+  button[disabled] {
+    cursor: not-allowed;
+    background-color: #bbb;
+  }
+
   #startScreen {
     padding-top: 30vh;
     text-align: center;
@@ -433,17 +448,10 @@
 
   #previousButton,
   #nextButton {
-    margin-top: 20px;
+    margin: 20px 0 50px;
   }
 
   #nextButton {
     float: right;
-    margin-top: 20px;
-  }
-
-  #nextButton:disabled {
-    background-color: rgb(145 136 135);
-    color: #bebebe;
-    cursor: default;
   }
 </style>

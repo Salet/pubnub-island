@@ -1,23 +1,27 @@
 <template>
   <div class="box">
     <h3>Your quest:</h3>
-    <p v-html="puzzle.question" />
+    <div v-if="!correct">
+      <p v-html="puzzle.question" />
+      <section>
+        <button
+          v-for="answer in puzzle.answers"
+          :key="answer"
+          @click="checkAnswer(answer)"
+          :disabled="waiting || correct"
+        >
+          {{ answer }}
+        </button>
+      </section>
+    </div>
 
-    <section>
-      <button
-        v-for="answer in puzzle.answers"
-        :key="answer"
-        @click="checkAnswer(answer)"
-        :disabled="waiting || correct"
-      >
-        {{ answer }}
-      </button>
-    </section>
+    <div v-else>
+      <p class="good">
+        That's correct! Use this clue to progress further:
+      </p>
+      <strong>{{ puzzle.clue }}</strong>
+    </div>
 
-    <p v-if="correct" class="good">
-      That's correct! Use this clue to progress further:
-    </p>
-    <strong v-if="correct">{{ puzzle.clue }}</strong>
     <p v-if="waiting" class="bad">
       That's an incorrect answer ;( Don't worry, you can try again in a few
       seconds!
@@ -73,10 +77,5 @@
     width: 48%;
     padding: 10px 0;
     margin: 10px 0;
-  }
-
-  button[disabled] {
-    background: #ccc;
-    cursor: default;
   }
 </style>
