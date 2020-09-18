@@ -1,16 +1,15 @@
 <template>
   <div id="app">
     <main>
-      <Header
-        :title="levels[currentLevel].title"
-        :description="levels[currentLevel].description"
-      />
-      <!-- <section v-if="levels[currentLevel].puzzle"> -->
-      <section>
+      <Header :title="level.title" :description="level.description" />
+      <section v-if="level.validator">
         <Puzzle />
-        <Answer />
+        <Validator
+          :initialScript="level.validator.initialScript"
+          :testHandler="level.validator.testHandler"
+        />
       </section>
-      <button @click="currentLevel++">Next ></button>
+      <button v-if="canProgress" @click="nextLevel">Next ></button>
     </main>
   </div>
 </template>
@@ -18,29 +17,69 @@
 <script>
   import Header from "./components/Header.vue";
   import Puzzle from "./components/Puzzle.vue";
-  import Answer from "./components/Answer.vue";
+  import Validator from "./components/Validator.vue";
 
   export default {
     name: "App",
     components: {
       Header,
       Puzzle,
-      Answer,
+      Validator,
+    },
+    methods: {
+      nextLevel: function() {
+        this.currentLevel++;
+        this.canProgress = false;
+      },
+      handleResult: function(value) {
+        value ? this.nextLevel() : alert("Sorry! That's a wrong answer");
+      },
+    },
+    computed: {
+      level: function() {
+        return this.levels[this.currentLevel];
+      },
     },
     data: function() {
       return {
         currentLevel: 0,
+        canProgress: true,
         levels: [
           {
             title: "Welcome to PubNub Island!",
-            description: `Hello. It looks like you landed on a deserted island of cross-device communication. Traditionally, one of the ways to signal your need of help would be through smoke signals.
-
-              Fortunately, nowadays there's a system that might help more easily and with better results: PubNub!
-
-              Lets quickly learn how to communicate with other people and devices through the use of PubNub.`,
+            description: `<p>Hello. It looks like you landed on a deserted island of cross-device communication.
+              Traditionally, one of the ways to signal your need of help would be through smoke signals.</p>
+              <p>Fortunately, nowadays there's a system that might help more easily and with better results: PubNub!</p>
+              <p>If you help me to solve some puzzles, I will teach you how to communicate with other people and devices
+              through the use of PubNub. This way, someone will receive your message almost immediately and come by to help you!
+              </p><p>At least I think they will...</p>`,
           },
           {
-            title: "Level 1: Getting your keys!",
+            title: "Level 1: Getting your API keys",
+            description: `<p>First thing to do in order to communicate with PubNub is getting your own pair of
+            publish/subscribe keys. In order to do that, you would normally go to pubnub.com, sign up for an account and then
+            create your own set of keys.</p><p>To make things even simpler, this time I will let you use mine keys.
+            But first, a puzzle!`,
+            validator: {
+              initialScript: `pubnub = new PubNub({\n  publishKey: "",\n  subscribeKey: ""\n})`,
+              testHandler: (script) => {
+                window.PubNub = function(obj) {
+                  this.publishKey = obj.publishKey;
+                  this.subscribeKey = obj.subscribeKey;
+                };
+                window.pubnub = {};
+
+                eval(script);
+
+                const result =
+                  window.pubnub.publishKey === "demo" &&
+                  window.pubnub.subscribeKey === "demo";
+                this.handleResult(result);
+              },
+            },
+          },
+          {
+            title: "Level 2: Subscribing to events",
           },
         ],
       };
@@ -49,17 +88,10 @@
 </script>
 
 <style>
-  /* Box sizing rules */
   *,
   *::before,
   *::after {
     box-sizing: border-box;
-  }
-
-  /* Remove default padding */
-  ul[class],
-  ol[class] {
-    padding: 0;
   }
 
   /* Remove default margin */
@@ -68,7 +100,6 @@
   h2,
   h3,
   h4,
-  p,
   ul[class],
   ol[class],
   li,
@@ -78,6 +109,11 @@
   dl,
   dd {
     margin: 0;
+  }
+
+  p {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
   }
 
   body {
@@ -92,15 +128,6 @@
     font-size: 20px;
   }
 
-  ul[class],
-  ol[class] {
-    list-style: none;
-  }
-
-  img {
-    max-width: 100%;
-  }
-
   input,
   button,
   textarea,
@@ -113,7 +140,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: #2c3e50;
-    height: 100vh;
+    min-height: 100vh;
     text-align: center;
   }
 
