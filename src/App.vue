@@ -26,6 +26,7 @@
       <!--Main Game-->
       <article v-if="screen === 'game'">
         <Header :title="level.title" :description="level.description" />
+        <IncomingMessage v-if="level.previousResult" :incomingMessages="level.previousResult"/>
         <section v-if="level.validator" id="gamearea">
           <Puzzle v-if="level.puzzle" :puzzle="level.puzzle" />
           <Validator
@@ -65,6 +66,7 @@
 <script>
   import { v4 as uuidv4 } from 'uuid';
   import Header from "./components/Header.vue";
+  import IncomingMessage from "./components/IncomingMessage.vue";
   import Puzzle from "./components/Puzzle.vue";
   import Validator from "./components/Validator.vue";
   import Toolbar from "./components/Toolbar.vue";
@@ -75,6 +77,7 @@
     name: "App",
     components: {
       Header,
+      IncomingMessage,
       Puzzle,
       Toolbar,
       Help,
@@ -113,17 +116,19 @@
       },
     },
     data: function() {
+      let generateAuthToken = () => uuidv4().substring(0,10);
       let subscribeChannel = uuidv4();
-      let correctAuthToken = uuidv4();
+      let correctAuthToken = generateAuthToken();
       let historyChannel = uuidv4();
       let publishChannel = uuidv4();
       let filterExpression = "lobster";
+      let coordinates = "37°46'56.2\\\"N 122°23'43.1\\\"W";
 
       return {
         screen: "start",
         currentLevel: 0,
-        unlockLevel: 0,
-        canProgress: false,
+        unlockLevel: 10,
+        canProgress: true,
         result: null,
         helpText: `<p>You awake, the lone survivor of a shipwreck on a mysterious island.
           After searching the island you discover an abandoned communications system.
@@ -221,6 +226,7 @@
           },
           {
             title: "Level 3: Filtering messages",
+            previousResult: "ALL AUTH TOKENS{ \"key\": \"value\" }",
             description: `<p>Success! You can now receive inbound communications! It seems that not all the authorization
               tokens are valid however. It's possible to filter out the invalid codes if you can get Pubba to help.</p>
               <p>Looks like its time for another puzzle!</p>`,
@@ -261,6 +267,7 @@
           },
           {
             title: "Level 4: Authorization",
+            previousResult: "{ \"operatorA\": \"" + generateAuthToken() + "\",\"operatorB\": \"" + correctAuthToken +"\",\"operatorC\": \"" + generateAuthToken() + "\" }",
             puzzle: {
               question: `<p>There is an island with cannibals, who always lie, explorers, who always tell the truth and pirates, who can be honest or dishonest.</p>
                 <p>On the island you are approached by three men. One wears blue, one wears red, and one wears green.</p>
@@ -320,6 +327,7 @@
           },
           {
             title: "Level 6: Publish",
+            previousResult: "{ \"dailyReport\": \"Weather is still hot at " + coordinates + ".\" }",
             puzzle: {
               question: `<p>There are five houses sitting next to each other on a neighborhood street. Each house's owner is of a different nationality. Each house has different colored walls. Each house's owner drinks their own specific beverage, smokes their own brand of cigar, and keeps a certain type of pet. None of the houses share any of these variables—nationality, wall color, beverage, cigar, and pet—they are all unique.</p><ul>
                 <ul>
