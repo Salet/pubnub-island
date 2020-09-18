@@ -37,4 +37,9 @@
     resize: none;
     border-color: #ccc;
   }
+
+  button {
+    margin-top: 20px;
+    float: right;
+  }
 </style>

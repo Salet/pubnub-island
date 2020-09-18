@@ -2,17 +2,34 @@
   <div id="app">
     <main>
       <!--Toolbar-->
-      <Toolbar v-if="screen !== 'start'" :showHelp="() => { this.screen = 'help'; }" :quitGame="quitGame"/>
+      <Toolbar
+        v-if="screen !== 'start'"
+        :showHelp="
+          () => {
+            this.screen = 'help';
+          }
+        "
+        :quitGame="quitGame"
+      />
 
       <!--Start Screen-->
       <article id="startScreen" v-if="screen === 'start'">
         <img src="@/assets/img/pubnublogo.png" alt="Game Logo" />
+        <h1>Island</h1>
         <button @click="screen = 'help'">Help</button>
         <button @click="screen = 'game'">Begin!</button>
       </article>
 
       <!--Instructions-->
-      <Help v-if="screen === 'help'" :helpText="helpText" :close="() => { this.screen = 'game'; }"/>
+      <Help
+        v-if="screen === 'help'"
+        :helpText="helpText"
+        :close="
+          () => {
+            this.screen = 'game';
+          }
+        "
+      />
 
       <!--Main Game-->
       <article v-if="screen === 'game'">
@@ -21,8 +38,20 @@
           <Puzzle :puzzle="level.puzzle" />
           <Validator :validator="level.validator" />
         </section>
-        <button id="previousButton" v-if="currentLevel > 0" @click="previousLevel">&#60; Previous</button>
-        <button id="nextButton" v-if="canProgress && currentLevel < levels.length" @click="nextLevel">Next &#62;</button>
+        <button
+          id="previousButton"
+          v-if="currentLevel > 0"
+          @click="previousLevel"
+        >
+          &#60; Previous
+        </button>
+        <button
+          id="nextButton"
+          v-if="canProgress && currentLevel < levels.length"
+          @click="nextLevel"
+        >
+          Next &#62;
+        </button>
       </article>
     </main>
   </div>
@@ -59,8 +88,8 @@
       quitGame: function() {
         this.currentLevel = 0;
         this.canProgress = false;
-        this.screen = 'start';
-      }
+        this.screen = "start";
+      },
     },
     computed: {
       level: function() {
@@ -167,6 +196,7 @@
     text-rendering: optimizeSpeed;
     line-height: 1.5;
     font-size: 20px;
+    padding-top: 50px;
   }
 
   input,
@@ -211,17 +241,23 @@
   }
 
   #startScreen {
+    padding-top: 30vh;
     text-align: center;
   }
 
   #startScreen img {
     margin: auto;
     display: block;
-    max-width: 50%;
+    max-width: 30%;
   }
 
   #startScreen button {
     margin: 20px 10px;
+  }
+
+  #previousButton,
+  #nextButton {
+    margin-top: 20px;
   }
 
   #nextButton {

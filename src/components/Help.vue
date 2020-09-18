@@ -2,8 +2,9 @@
   <div class="box">
     <h3>PubNub Island</h3>
     <div v-html="helpText"></div>
-
-    <button @click="closeHelp()">Close</button>
+    <section>
+      <button @click="closeHelp()">Begin!</button>
+    </section>
   </div>
 </template>
 
@@ -12,9 +13,9 @@
     name: "Help",
     props: {
       helpText: String,
-      close: Function
+      close: Function,
     },
-    data: function () {
+    data: function() {
       return {
         closeHelp: this.close,
       };
@@ -23,9 +24,11 @@
 </script>
 
 <style scoped>
-  .box {
-    margin-right: 20px;
-    flex-grow: 3;
-    margin-top: 50px;
+  section {
+    text-align: center;
+  }
+
+  button {
+    margin: 20px auto 0;
   }
 </style>

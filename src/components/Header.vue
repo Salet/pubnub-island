@@ -20,7 +20,6 @@
   .box {
     padding-left: 120px;
     position: relative;
-    margin-top:50px;
     margin-bottom: 20px;
   }
 
