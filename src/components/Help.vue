@@ -13,6 +13,7 @@
     name: "Help",
     props: {
       helpText: String,
+      gameStarted: Boolean
     },
     methods: {
       handleCloseClick: function() {

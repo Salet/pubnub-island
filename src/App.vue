@@ -63,6 +63,7 @@
 </template>
 
 <script>
+  import { v4 as uuidv4 } from 'uuid';
   import Header from "./components/Header.vue";
   import Puzzle from "./components/Puzzle.vue";
   import Validator from "./components/Validator.vue";
@@ -112,9 +113,14 @@
       },
     },
     data: function() {
+      let subscribeChannel = uuidv4();
+      let correctAuthToken = uuidv4();
+      let historyChannel = uuidv4();
+      let publishChannel = uuidv4();
+      let filterExpression = "lobster";
+
       return {
         screen: "start",
-        pnChannel: "randomize-me",
         currentLevel: 0,
         unlockLevel: 0,
         canProgress: false,
@@ -133,7 +139,7 @@
             title: "Level 1: Authenticate the system",
             description: `<p>In order to use the communication system you first need to authenticate.
               Pubba the parrot will give you the authentication keys if you can solve his puzzle!<p>`,
-            onComplete: `<p>Very well!</p><p>To make your own PubNub keys once you're back to safety, visit
+            onComplete: `<p>Nice!</p><p>To make your own PubNub keys once you're back to safety, visit
               <a href="https://www.pubnub.com/signup" target="_blank">www.pubnub.com/signup</a> and sign up for for your own free account!</p>`,
             onFail: `Something seems wrong with your script. Make sure that the resulting object is called "pubnub", it is defined
               on window scope and has a correct set of keys.`,
@@ -147,13 +153,9 @@
             },
             validator: {
               initialScript: `import PubNub from pubnub;`,
-              editableScript: `pubnub = new PubNub({\n  publishKey: "",\n  subscribeKey: ""\n})`,
+              editableScript: `pubnub = new PubNub({\n  publishKey: "",\n  subscribeKey: ""\n});`,
             },
             testHandler: (script) => {
-              window.PubNub = function(obj) {
-                this.publishKey = obj.publishKey;
-                this.subscribeKey = obj.subscribeKey;
-              };
               window.pubnub = {};
               eval(script);
               return (
@@ -179,7 +181,7 @@
                 <p>What is the minimum number of fruits you need to inspect in order to be able to correctly identify all three crates?</p>`,
               answers: ["1", "1 < X < 6", "5 < X < 15", "15 < X"],
               solution: "1",
-              clue: `You need to subscribe to channel "randomize-me". Use this channel name in the code on the right to start receiving PubNub messages!`,
+              clue: `You need to subscribe to channel "`+ subscribeChannel + `". Use this channel name in the code on the right to start receiving PubNub messages!`,
             },
             validator: {
               initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n})
@@ -233,23 +235,23 @@
               answers: ["Adam 6-4", "Eve 6-4", "Adam 7-3", "Eve 7-3"],
               solution: "Adam 7-3",
               clue:
-                'The filter expression you need is "lobster". Filter PubNub messages in your code on the right with this expression!',
+                'The filter expression you need is "' + filterExpression + '". Filter PubNub messages in your code on the right with this expression!',
             },
             validator: {
-              initialScript: `pubnub = new PubNub({\n  publishKey: "",\n  subscribeKey: ""\n})`,
+              initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n});\n\npubnub.addListener({\n  message: function(msg) {\n    receivedMsg = msg;\n  }\n});\n\npubnub.subscribe({channels: ['` + subscribeChannel + `']});`,
+              editableScript: `pubnub.setFilterExpression("");`,
             },
             testHandler: (script) => {
-              window.PubNub = function(obj) {
-                this.publishKey = obj.publishKey;
-                this.subscribeKey = obj.subscribeKey;
-              };
               window.pubnub = {};
+
+              window.pubnub.setFilterExpression = (expression) => {
+                window.pubnub.filterExpression = expression
+              }
 
               eval(script);
 
               return (
-                window.pubnub.publishKey === "demo" &&
-                window.pubnub.subscribeKey === "demo"
+                window.pubnub.filterExpression === filterExpression
               );
             },
           },
@@ -269,9 +271,29 @@
                 "You need to use the authorization token for operator B. Provide the correct auth token in your code on the right to apply the correct authorization permissions to your PubNub client!",
             },
             validator: {
-              initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n})`,
-              editableScript: `pubnub.addListener({\n  message: function(msg) { \n    console.log(msg);\n  }\n});`,
-              testHandler: () => {},
+              initialScript: `import PubNub from 'pubnub';`,
+              editableScript: `pubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo",\n  authKey: ""\n});`,
+              testHandler: (script) => {
+
+                // pubnub.grant({
+                //   channels: [publishChannel],
+                //   authKeys: [correctAuthToken],
+                //   read: true,
+                //   write: true,
+                // }, (status) => {
+                //   // handle status
+                // });
+                // pubnub.grant({
+                //   channels: [historyChannel],
+                //   authKeys: [correctAuthToken],
+                //   read: true,
+                // }, (status) => {
+                //   // handle status
+                // });
+                window.pubnub = {};
+                eval(script);
+                return (window.pubnub.authKey === correctAuthToken);
+              },
             },
           },
           {
@@ -284,11 +306,11 @@
               answers: ["5", "8", "11", "15"],
               solution: "11",
               clue:
-                "The channel you need to retrieve history from is channel z. Fetch historical PubNub messages in your code on the right using this channel name!",
+                "The channel you need to retrieve history from is channel \"" + historyChannel + "\". Fetch historical PubNub messages in your code on the right using this channel name!",
             },
             validator: {
-              initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n})`,
-              editableScript: `pubnub.addListener({\n  message: function(msg) { \n    console.log(msg);\n  }\n});`,
+              initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n  authKey: "` + correctAuthToken + `"\n})`,
+              editableScript: `pubnub.fetchMessages({\n  channels: [""], count: 1\n});`,
               testHandler: () => {},
             },
           },
@@ -297,7 +319,7 @@
             puzzle: {
               question: `<p>There are five houses sitting next to each other on a neighborhood street. Each house's owner is of a different nationality. Each house has different colored walls. Each house's owner drinks their own specific beverage, smokes their own brand of cigar, and keeps a certain type of pet. None of the houses share any of these variables—nationality, wall color, beverage, cigar, and pet—they are all unique.</p><ul>
                 <ul>
-                  <li>The Englishman lives in the house with red walls.The Swede keeps dogs.</ul>li>
+                  <li>The Englishman lives in the house with red walls.The Swede keeps dogs.</li>
                   <li>The Dane drinks tea.</li>
                   <li>The house with green walls is just to the left of the house with white walls.</li>
                   <li>The owner of the house with green walls drinks coffee.</li>
@@ -316,11 +338,11 @@
               answers: ["House 1", "House 2", "House 3", "House 4", "House 5"],
               solution: "House 4",
               clue:
-                "You need to publish your SOS to channel y. Publish your first PubNub message containing the island coordinates to this channel in your code on the right!",
+                "You need to publish your SOS to channel \"" + publishChannel + "\". Publish your first PubNub message containing the island coordinates to this channel in your code on the right!",
             },
             validator: {
-              initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n})`,
-              editableScript: `pubnub.addListener({\n  message: function(msg) { \n    console.log(msg);\n  }\n});`,
+              initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n  authKey: "` + correctAuthToken + `"\n})`,
+              editableScript: `pubnub.publish({\n  channel: "",\n  message: {\n    sos: "Send Help!",\n    coordinates: "" \n  }\n});`,
               testHandler: () => {},
             },
           },
