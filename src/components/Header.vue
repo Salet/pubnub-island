@@ -2,7 +2,7 @@
   <div class="box">
     <img src="@/assets/img/parrot.svg" />
     <h1>{{ title }}</h1>
-    <p>{{ description }}</p>
+    <div v-html="description"></div>
   </div>
 </template>
 
@@ -36,9 +36,5 @@
   h1 {
     display: inline;
     vertical-align: center;
-  }
-
-  p {
-    white-space: pre-line;
   }
 </style>

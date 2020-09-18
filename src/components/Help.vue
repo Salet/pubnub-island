@@ -18,6 +18,6 @@
   .box {
     margin-right: 20px;
     flex-grow: 3;
-    margin-top:50px;
+    margin-top: 50px;
   }
 </style>

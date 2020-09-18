@@ -13,20 +13,23 @@
 
       <!--Instructions-->
       <Help v-if="screen === 'help'"
-        :helpText="helpText"
+            :helpText="helpText"
       />
 
       <!--Main Game-->
       <article v-if="screen === 'game'">
         <Header
-          :title="levels[currentLevel].title"
-          :description="levels[currentLevel].description"
+          :title="level.title"
+          :description="level.description"
         />
-        <section>
-          <Puzzle />
-          <Answer />
+        <section v-if="level.validator">
+          <Puzzle/>
+          <Validator
+            :initialScript="level.validator.initialScript"
+            :testHandler="level.validator.testHandler"
+          />
         </section>
-        <button id="nextButton" @click="[currentLevel++]">Next ></button>
+        <button id="nextButton" v-if="canProgress" @click="nextLevel">Next ></button>
       </article>
     </main>
   </div>
@@ -35,7 +38,7 @@
 <script>
   import Header from "./components/Header.vue";
   import Puzzle from "./components/Puzzle.vue";
-  import Answer from "./components/Answer.vue";
+  import Validator from "./components/Validator.vue";
   import Toolbar from "./components/Toolbar.vue";
   import Help from "./components/Help.vue";
 
@@ -44,30 +47,70 @@
     components: {
       Header,
       Puzzle,
-      Answer,
       Toolbar,
-      Help
+      Help,
+      Validator,
     },
-    data: function() {
+    methods: {
+      nextLevel: function () {
+        this.currentLevel++;
+        this.canProgress = false;
+      },
+      handleResult: function (value) {
+        value ? this.nextLevel() : alert("Sorry! That's a wrong answer");
+      },
+    },
+    computed: {
+      level: function () {
+        return this.levels[this.currentLevel];
+      }
+    },
+    data: function () {
       return {
         screen: "start",
         currentLevel: 0,
+        canProgress: true,
         helpText: `You awake, the lone survivor of a shipwreck on a mysterious island. After searching the island you discover a now abandoned communications system. If you can figure out how to work the system you just might be able to signal for help.
 
          You've got access to the communications handbook but are missing certain configuration parameters. Luckily it seems the old system operators have hidden the necessary configuration through a series of puzzles.
 
          To escape the island you need to crack the puzzles, correctly operate the communications system and broadcast your SOS message!`,
         levels: [
+          // {
+          //   title: "Welcome to PubNub Island!",
+          //   description: `<p>Hello. It looks like you landed on a deserted island of cross-device communication.
+          //     Traditionally, one of the ways to signal your need of help would be through smoke signals.</p>
+          //     <p>Fortunately, nowadays there's a system that might help more easily and with better results: PubNub!</p>
+          //     <p>If you help me to solve some puzzles, I will teach you how to communicate with other people and devices
+          //     through the use of PubNub. This way, someone will receive your message almost immediately and come by to help you!
+          //     </p><p>At least I think they will...</p>`,
+          // },
           {
-            title: "Welcome to PubNub Island!",
-            description: `Hello. It looks like you landed on a deserted island of cross-device communication. Traditionally, one of the ways to signal your need of help would be through smoke signals.
+            title: "Level 1: Getting your API keys",
+            description: `<p>First thing to do in order to communicate with PubNub is getting your own pair of
+            publish/subscribe keys. In order to do that, you would normally go to pubnub.com, sign up for an account and then
+            create your own set of keys.</p><p>To make things even simpler, this time I will let you use mine keys.
+            But first, a puzzle!`,
+            validator: {
+              initialScript: `pubnub = new PubNub({\n  publishKey: "",\n  subscribeKey: ""\n})`,
+              testHandler: (script) => {
+                window.PubNub = function (obj) {
+                  this.publishKey = obj.publishKey;
+                  this.subscribeKey = obj.subscribeKey;
+                };
+                window.pubnub = {};
 
-              Fortunately, nowadays there's a system that might help more easily and with better results: PubNub!
+                eval(script);
 
-              Lets quickly learn how to communicate with other people and devices through the use of PubNub.`,
+                const result =
+                  window.pubnub.publishKey === "demo" &&
+                  window.pubnub.subscribeKey === "demo";
+                this.handleResult(result);
+              },
+            },
           },
           {
-            title: "Level 1: Getting your keys!",
+            title: "Level 2: Subscribing to events",
           },
         ],
       };
@@ -76,17 +119,10 @@
 </script>
 
 <style>
-  /* Box sizing rules */
   *,
   *::before,
   *::after {
     box-sizing: border-box;
-  }
-
-  /* Remove default padding */
-  ul[class],
-  ol[class] {
-    padding: 0;
   }
 
   /* Remove default margin */
@@ -95,7 +131,6 @@
   h2,
   h3,
   h4,
-  p,
   ul[class],
   ol[class],
   li,
@@ -105,6 +140,11 @@
   dl,
   dd {
     margin: 0;
+  }
+
+  p {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
   }
 
   body {
@@ -119,15 +159,6 @@
     font-size: 20px;
   }
 
-  ul[class],
-  ol[class] {
-    list-style: none;
-  }
-
-  img {
-    max-width: 100%;
-  }
-
   input,
   button,
   textarea,
@@ -140,7 +171,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: #2c3e50;
-    height: 100vh;
+    min-height: 100vh;
     text-align: center;
   }
 
