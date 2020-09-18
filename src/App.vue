@@ -28,7 +28,19 @@
         <Header :title="level.title" :description="level.description" />
         <section v-if="level.validator" id="gamearea">
           <Puzzle v-if="level.puzzle" :puzzle="level.puzzle" />
-          <Validator v-if="level.validator" :validator="level.validator" />
+          <Validator
+            v-if="level.validator"
+            :validator="level.validator"
+            :result="result"
+            :clue="
+              result == false
+                ? level.onFail
+                : result == true
+                ? level.onComplete
+                : ''
+            "
+            @check="validateScript"
+          />
         </section>
         <button
           id="previousButton"
@@ -71,25 +83,24 @@
         this.currentLevel++;
         if (this.currentLevel === this.unlockLevel) {
           this.canProgress = false;
+          this.result = null;
         }
       },
       previousLevel: function() {
         this.currentLevel--;
         this.canProgress = true;
       },
-      handleResult: function(value) {
-        if (value) {
-          this.canProgress = true;
-          this.unlockLevel === this.currentLevel && this.unlockLevel++;
-          alert(this.level.onComplete);
-        } else {
-          alert("Sorry! That's a wrong answer");
-        }
-      },
       quitGame: function() {
         this.currentLevel = 0;
         this.canProgress = false;
         this.screen = "start";
+      },
+      validateScript: function(script) {
+        this.result = this.level.testHandler(script);
+        if (this.result) {
+          this.canProgress = true;
+          this.unlockLevel === this.currentLevel && this.unlockLevel++;
+        }
       },
     },
     computed: {
@@ -103,6 +114,7 @@
         currentLevel: 0,
         unlockLevel: 0,
         canProgress: false,
+        result: null,
         helpText: `<p>You awake, the lone survivor of a shipwreck on a mysterious island.
           After searching the island you discover an abandoned communications system.
           If you can figure out how to work the system you might just be able to signal for help.</p>
@@ -117,32 +129,33 @@
             title: "Level 1: Authenticate the system",
             description: `<p>In order to use the communication system you first need to authenticate.
               Pubba the parrot will give you the authentication keys if you can solve his puzzle!<p>`,
-            onComplete: `To make your own PubNub keys once you're back to safety, visit
-              <a href="https://www.pubnub.com/signup" target="_blank">www.pubnub.com/signup</a> and sign up for for your own free account!`,
+            onComplete: `<p>Very well!</p><p>To make your own PubNub keys once you're back to safety, visit
+              <a href="https://www.pubnub.com/signup" target="_blank">www.pubnub.com/signup</a> and sign up for for your own free account!</p>`,
+            onFail: `Something seems wrong with your script. Make sure that the resulting object is called "pubnub", it is defined
+              on window scope and has a correct set of keys.`,
             puzzle: {
               question:
                 "If five cats can catch five mice in five minutes, how long will it take one cat to catch one mouse?",
               answers: ["1min", "5min", "2min", "10min"],
               solution: "5min",
               clue:
-                "Your PubNub keyset is demo/demo. Initialize your object on the right with those keys to start working with PubNub right away!",
+                "Your PubNub keyset is demo/demo. Initialize your object with those keys to start working with PubNub right away!",
             },
             validator: {
-              initialScript: `pubnub = new PubNub({\n  publishKey: "",\n  subscribeKey: ""\n})`,
-              testHandler: (script) => {
-                window.PubNub = function(obj) {
-                  this.publishKey = obj.publishKey;
-                  this.subscribeKey = obj.subscribeKey;
-                };
-                window.pubnub = {};
-
-                eval(script);
-
-                const result =
-                  window.pubnub.publishKey === "demo" &&
-                  window.pubnub.subscribeKey === "demo";
-                this.handleResult(result);
-              },
+              initialScript: `import PubNub from pubnub;`,
+              editableScript: `pubnub = new PubNub({\n  publishKey: "",\n  subscribeKey: ""\n})`,
+            },
+            testHandler: (script) => {
+              window.PubNub = function(obj) {
+                this.publishKey = obj.publishKey;
+                this.subscribeKey = obj.subscribeKey;
+              };
+              window.pubnub = {};
+              eval(script);
+              return (
+                window.pubnub.publishKey === "demo" &&
+                window.pubnub.subscribeKey === "demo"
+              );
             },
           },
           {
@@ -153,6 +166,7 @@
             previous system operators' authorization tokens. He will only tell you the channel to listen on if you can solve his puzzle!<p>`,
             onComplete: `To learn how to subscribe to your own PubNub channels once you're back to safety,
               visit <a href="https://www.pubnub.com/docs" target="_blank">www.pubnub.com/docs</a>!`,
+            onFail: "",
             puzzle: {
               question:
                 "If five cats can catch five mice in five minutes, how long will it take one cat to catch one mouse?",
@@ -162,22 +176,22 @@
                 "Your PubNub keyset is demo/demo. Initialize your object on the right with those keys to start working with PubNub right away!",
             },
             validator: {
-              initialScript: `import PubNub from 'pubnub';`,
-              editableScript: `pubnub = new PubNub({\n  publishKey: "",\n  subscribeKey: ""\n})`,
-              testHandler: (script) => {
-                window.PubNub = function(obj) {
-                  this.publishKey = obj.publishKey;
-                  this.subscribeKey = obj.subscribeKey;
-                };
-                window.pubnub = {};
+              initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n})`,
+              editableScript: `pubnub.addListener({\n  message: function(msg) {\n    console.log(msg);\n  }\n});`,
+            },
+            testHandler: (script) => {
+              window.PubNub = function(obj) {
+                this.publishKey = obj.publishKey;
+                this.subscribeKey = obj.subscribeKey;
+              };
+              window.pubnub = {};
 
-                eval(script);
+              eval(script);
 
-                const result =
-                  window.pubnub.publishKey === "demo" &&
-                  window.pubnub.subscribeKey === "demo";
-                this.handleResult(result);
-              },
+              return (
+                window.pubnub.publishKey === "demo" &&
+                window.pubnub.subscribeKey === "demo"
+              );
             },
           },
           {
@@ -187,6 +201,7 @@
               Looks like its time for another puzzle!<p>`,
             onComplete: `To learn how to use filter streaming once you're back to safety, visit
               <a href="https://www.pubnub.com/docs" target="_blank">www.pubnub.com/docs</a>!`,
+            onFail: "",
             puzzle: {
               question:
                 "If five cats can catch five mice in five minutes, how long will it take one cat to catch one mouse?",
@@ -197,20 +212,20 @@
             },
             validator: {
               initialScript: `pubnub = new PubNub({\n  publishKey: "",\n  subscribeKey: ""\n})`,
-              testHandler: (script) => {
-                window.PubNub = function(obj) {
-                  this.publishKey = obj.publishKey;
-                  this.subscribeKey = obj.subscribeKey;
-                };
-                window.pubnub = {};
+            },
+            testHandler: (script) => {
+              window.PubNub = function(obj) {
+                this.publishKey = obj.publishKey;
+                this.subscribeKey = obj.subscribeKey;
+              };
+              window.pubnub = {};
 
-                eval(script);
+              eval(script);
 
-                const result =
-                  window.pubnub.publishKey === "demo" &&
-                  window.pubnub.subscribeKey === "demo";
-                this.handleResult(result);
-              },
+              return (
+                window.pubnub.publishKey === "demo" &&
+                window.pubnub.subscribeKey === "demo"
+              );
             },
           },
           {
@@ -310,6 +325,14 @@
     background: rgba(255, 255, 255, 0.7);
     border-radius: 5px;
     padding: 20px 30px;
+  }
+
+  .good {
+    color: green;
+  }
+
+  .bad {
+    color: rgb(229, 85, 78);
   }
 
   #gamearea {

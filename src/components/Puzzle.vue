@@ -14,11 +14,11 @@
       </button>
     </section>
 
-    <p v-if="correct" id="good">
+    <p v-if="correct" class="good">
       That's correct! Use this clue to progress further:
     </p>
-    <p v-if="correct">{{ puzzle.clue }}</p>
-    <p v-if="waiting" id="bad">
+    <strong v-if="correct">{{ puzzle.clue }}</strong>
+    <p v-if="waiting" class="bad">
       That's an incorrect answer ;( Don't worry, you can try again in a few
       seconds!
     </p>
@@ -78,13 +78,5 @@
   button[disabled] {
     background: #ccc;
     cursor: default;
-  }
-
-  #good {
-    color: green;
-  }
-
-  #bad {
-    color: rgb(229, 85, 78);
   }
 </style>

@@ -3,7 +3,8 @@
     <h3>Use your new skills here:</h3>
     <pre v-if="validator.initialScript">{{ validator.initialScript }}</pre>
     <textarea v-model="value"></textarea>
-    <button @click="validator.testHandler(value)">Check</button>
+    <div id="clue" v-html="clue" :class="result ? 'good' : 'bad'"></div>
+    <button v-if="!result" @click="handleCheck">Check</button>
   </div>
 </template>
 
@@ -14,8 +15,9 @@
       validator: {
         initialScript: String,
         editableScript: String,
-        testHandler: Function,
       },
+      result: Boolean,
+      clue: String,
     },
     watch: {
       validator: function(newValidator) {
@@ -26,6 +28,11 @@
       return {
         value: this.validator.editableScript,
       };
+    },
+    methods: {
+      handleCheck: function() {
+        this.$emit("check", this.value);
+      },
     },
   };
 </script>
@@ -59,5 +66,9 @@
   button {
     margin-top: 20px;
     float: right;
+  }
+
+  #clue {
+    margin-top: 20px;
   }
 </style>
