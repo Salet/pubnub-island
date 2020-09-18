@@ -88,7 +88,7 @@
       handleResult: function(value) {
         if (value) {
           this.canProgress = true;
-          this.unlockLevel++;
+          this.unlockLevel === this.currentLevel && this.unlockLevel++;
           alert(this.level.onComplete);
         } else {
           alert("Sorry! That's a wrong answer");
@@ -127,9 +127,38 @@
           //     </p><p>At least I think they will...</p>`,
           // },
           {
-            title: "Level 1: Active the system",
+            title: "Level 1: Authenticate the system",
             description: `<p>In order to use the communication system you first need to authenticate. Pubba the parrot will give you the authentication keys if you can solve his puzzle!<p>`,
-            onComplete: `To make your own PubNub keys once your back to safety, visit <a href="https://www.pubnub.com/signup" target="_blank">www.pubnub.com</a> and sign up for for your own free account!`,
+            onComplete: `To make your own PubNub keys once you're back to safety, visit <a href="https://www.pubnub.com/signup" target="_blank">www.pubnub.com/signup</a> and sign up for for your own free account!`,
+            puzzle: {
+              question: "If five cats can catch five mice in five minutes, how long will it take one cat to catch one mouse?",
+              answers: ["1min", "5min", "2min", "10min"],
+              solution: "5min",
+              clue: "Your PubNub keyset is demo/demo. Initialize your object on the right with those keys to start working with PubNub right away!",
+            },
+            validator: {
+              initialScript: `pubnub = new PubNub({\n  publishKey: "",\n  subscribeKey: ""\n})`,
+              testHandler: (script) => {
+                window.PubNub = function(obj) {
+                  this.publishKey = obj.publishKey;
+                  this.subscribeKey = obj.subscribeKey;
+                };
+                window.pubnub = {};
+
+                eval(script);
+
+                const result =
+                  window.pubnub.publishKey === "demo" &&
+                  window.pubnub.subscribeKey === "demo";
+                this.handleResult(result);
+              },
+            },
+          },
+          {
+            title: "Level 2: Subscribing to communication channels",
+            description: `<p>Success! You've successfully authenticated yourself. It looks like this system has been secured with access controls however so we will need to authorize in order to broadcast our SOS.</p>
+<p>Pubba tells you that if you subscribe to the correct communication channel you can obtain the islands previous system operators' authorization tokens. He will only tell you the channel to listen on if you can solve his puzzle!<p>`,
+            onComplete: `To learn how to subscribe to your own PubNub channels once you're back to safety, visit <a href="https://www.pubnub.com/docs" target="_blank">www.pubnub.com/docs</a>!`,
             puzzle: {
               question:
                 "If five cats can catch five mice in five minutes, how long will it take one cat to catch one mouse?",
@@ -158,13 +187,60 @@
             },
           },
           {
-            title: "Level 2: Subscribing to events",
+            title: "Level 3: Filtering messages",
+            description: `<p>Success! You can now receive inbound communications! It seems that not all the authorization tokens are valid however. Its possible to filter out the invalid codes if you can get Pubba to help. Looks like its time for another puzzle!<p>`,
+            onComplete: `To learn how to use filter streaming once you're back to safety, visit <a href="https://www.pubnub.com/docs" target="_blank">www.pubnub.com/docs</a>!`,
+            puzzle: {
+              question: "If five cats can catch five mice in five minutes, how long will it take one cat to catch one mouse?",
+              answers: ["1min", "5min", "2min", "10min"],
+              solution: "5min",
+              clue: "Your PubNub keyset is demo/demo. Initialize your object on the right with those keys to start working with PubNub right away!",
+            },
+            validator: {
+              initialScript: `pubnub = new PubNub({\n  publishKey: "",\n  subscribeKey: ""\n})`,
+              testHandler: (script) => {
+                window.PubNub = function(obj) {
+                  this.publishKey = obj.publishKey;
+                  this.subscribeKey = obj.subscribeKey;
+                };
+                window.pubnub = {};
+
+                eval(script);
+
+                const result =
+                  window.pubnub.publishKey === "demo" &&
+                  window.pubnub.subscribeKey === "demo";
+                this.handleResult(result);
+              },
+            },
+          },
+          {
+            title: "Level 4: Authorization",
             validator: {
               initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n})`,
               editableScript: `pubnub.addListener({\n  message: function(msg) { \n    console.log(msg);\n  }\n});`,
-              testHandler: () => {},
-            },
+              testHandler: () => {
+              },
+            }
           },
+          {
+            title: "Level 5: History",
+            validator: {
+              initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n})`,
+              editableScript: `pubnub.addListener({\n  message: function(msg) { \n    console.log(msg);\n  }\n});`,
+              testHandler: () => {
+              },
+            }
+          },
+          {
+            title: "Level 6: Publish",
+            validator: {
+              initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n})`,
+              editableScript: `pubnub.addListener({\n  message: function(msg) { \n    console.log(msg);\n  }\n});`,
+              testHandler: () => {
+              },
+            }
+          }
         ],
       };
     },
