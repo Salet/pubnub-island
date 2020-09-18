@@ -183,7 +183,7 @@
             },
             validator: {
               initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n})
-                \n\npubnub.addListener({\n  message: function(msg) {\n    // handle incoming messages in a listener\n  }\n});`,
+                \npubnub.addListener({\n  message: function(msg) {\n    // handle incoming messages in a listener\n  }\n});`,
               editableScript: `pubnub.subscribe({channels: ['channel_name']});`,
             },
             // this particular handler might blink with an incorrect result message for a bit even for good answers
