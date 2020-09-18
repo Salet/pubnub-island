@@ -2,34 +2,28 @@
   <div id="app">
     <main>
       <!--Toolbar-->
-      <Toolbar v-if="screen !== 'start'"/>
+      <Toolbar v-if="screen !== 'start'" />
 
       <!--Start Screen-->
       <article id="startScreen" v-if="screen === 'start'">
-        <img src="@/assets/img/pubnublogo.png">
+        <img src="@/assets/img/pubnublogo.png" />
         <button @click="screen = 'help'">Instructions</button>
         <button @click="screen = 'game'">Begin!</button>
       </article>
 
       <!--Instructions-->
-      <Help v-if="screen === 'help'"
-            :helpText="helpText"
-      />
+      <Help v-if="screen === 'help'" :helpText="helpText" />
 
       <!--Main Game-->
       <article v-if="screen === 'game'">
-        <Header
-          :title="level.title"
-          :description="level.description"
-        />
+        <Header :title="level.title" :description="level.description" />
         <section v-if="level.validator">
-          <Puzzle/>
-          <Validator
-            :initialScript="level.validator.initialScript"
-            :testHandler="level.validator.testHandler"
-          />
+          <Puzzle :puzzle="level.puzzle" />
+          <Validator :validator="level.validator" />
         </section>
-        <button id="nextButton" v-if="canProgress" @click="nextLevel">Next ></button>
+        <button id="nextButton" v-if="canProgress" @click="nextLevel">
+          Next >
+        </button>
       </article>
     </main>
   </div>
@@ -52,20 +46,20 @@
       Validator,
     },
     methods: {
-      nextLevel: function () {
+      nextLevel: function() {
         this.currentLevel++;
         this.canProgress = false;
       },
-      handleResult: function (value) {
+      handleResult: function(value) {
         value ? this.nextLevel() : alert("Sorry! That's a wrong answer");
       },
     },
     computed: {
-      level: function () {
+      level: function() {
         return this.levels[this.currentLevel];
-      }
+      },
     },
-    data: function () {
+    data: function() {
       return {
         screen: "start",
         currentLevel: 0,
@@ -91,10 +85,18 @@
             publish/subscribe keys. In order to do that, you would normally go to pubnub.com, sign up for an account and then
             create your own set of keys.</p><p>To make things even simpler, this time I will let you use mine keys.
             But first, a puzzle!`,
+            puzzle: {
+              question:
+                "If five cats can catch five mice in five minutes, how long will it take one cat to catch one mouse?",
+              answers: ["1min", "5min", "2min", "10min"],
+              solution: "5min",
+              clue:
+                "Your PubNub keyset is demo/demo. Initialize your object on the right with those keys to start working with PubNub right away!",
+            },
             validator: {
               initialScript: `pubnub = new PubNub({\n  publishKey: "",\n  subscribeKey: ""\n})`,
               testHandler: (script) => {
-                window.PubNub = function (obj) {
+                window.PubNub = function(obj) {
                   this.publishKey = obj.publishKey;
                   this.subscribeKey = obj.subscribeKey;
                 };
@@ -152,7 +154,7 @@
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center center;
-    min-height: 100vh;
+    height: 100vh;
     scroll-behavior: smooth;
     text-rendering: optimizeSpeed;
     line-height: 1.5;
@@ -171,7 +173,6 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: #2c3e50;
-    min-height: 100vh;
     text-align: center;
   }
 
@@ -212,7 +213,7 @@
   }
 
   #startScreen button {
-    margin: 20px 10px
+    margin: 20px 10px;
   }
 
   #nextButton {

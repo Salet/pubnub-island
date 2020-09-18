@@ -2,7 +2,7 @@
   <div class="box">
     <h3>Use your new skills here:</h3>
     <textarea v-model="value"></textarea>
-    <button @click="testHandler(value)">Check</button>
+    <button @click="validator.testHandler(value)">Check</button>
   </div>
 </template>
 
@@ -10,12 +10,14 @@
   export default {
     name: "Validator",
     props: {
-      initialScript: String,
-      testHandler: Function,
+      validator: {
+        initialScript: String,
+        testHandler: Function,
+      },
     },
-    data: function () {
+    data: function() {
       return {
-        value: this.initialScript,
+        value: this.validator.initialScript,
       };
     },
   };
@@ -23,7 +25,7 @@
 
 <style scoped>
   .box {
-    flex-grow: 7;
+    width: 60%;
   }
 
   textarea {
