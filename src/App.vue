@@ -63,7 +63,7 @@
 </template>
 
 <script>
-  import { v4 as uuidv4 } from 'uuid';
+  import { v4 as uuidv4 } from "uuid";
   import Header from "./components/Header.vue";
   import Puzzle from "./components/Puzzle.vue";
   import Validator from "./components/Validator.vue";
@@ -174,22 +174,24 @@
             been secured with access controls however so we will need to authorize in order to broadcast our SOS.</p>
             <p>Pubba tells you that if you subscribe to the correct communication channel you can obtain the islands
             previous system operators' authorization tokens. He will only tell you the channel to listen on if you can solve his puzzle!<p>`,
-            onComplete: `To learn how to subscribe to your own PubNub channels once you're back to safety,
+            onComplete: `Splendid! To learn how to subscribe to your own PubNub channels once you're back to safety,
               visit <a href="https://www.pubnub.com/docs" target="_blank">www.pubnub.com/docs</a>!`,
             onFail:
               "Something went wrong as your listener haven't received our message. Perhaps you subscribed to a wrong channel?",
             puzzle: {
-              question: `<p>There are 3 crates in front of you. One contains only coconuts, one contains only bananas. The third crate contains a mixture of coconuts and bananas.</p>
+              question: `<p>There are 3 crates in front of you. One contains only coconuts, one contains only bananas.
+                The third crate contains a mixture of coconuts and bananas.</p>
                 <p>Someone has switched around the labels however so that now none of the crates correctly match their associated label.</p>
                 <p>You can't look inside the crates but can remove one piece of fruit at a time.</p>
                 <p>What is the minimum number of fruits you need to inspect in order to be able to correctly identify all three crates?</p>`,
               answers: ["1", "1 < X < 6", "5 < X < 15", "15 < X"],
               solution: "1",
-              clue: `You need to subscribe to channel "`+ subscribeChannel + `". Use this channel name in the code on the right to start receiving PubNub messages!`,
+              clue: `You need to subscribe to channel "${subscribeChannel}". Use this channel name in the code on the
+                right to start receiving PubNub messages!`,
             },
             validator: {
               initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n})
-                \npubnub.addListener({\n  message: function(msg) {\n    // handle incoming messages in a listener\n  }\n});`,
+                \npubnub.addListener({\n  message: function(msg) {\n    // you can handle incoming messages in a listener\n  }\n});`,
               editableScript: `pubnub.subscribe({channels: ['channel_name']});`,
             },
             // this particular handler might blink with an incorrect result message for a bit even for good answers
@@ -212,7 +214,7 @@
               eval(script);
 
               window.pubnub.publish({
-                channel: this.pnChannel,
+                channel: subscribeChannel,
                 message: msgText,
               });
 
@@ -239,30 +241,33 @@
               answers: ["Adam 6-4", "Eve 6-4", "Adam 7-3", "Eve 7-3"],
               solution: "Adam 7-3",
               clue:
-                'The filter expression you need is "' + filterExpression + '". Filter PubNub messages in your code on the right with this expression!',
+                'The filter expression you need is "' +
+                filterExpression +
+                '". Filter PubNub messages in your code on the right with this expression!',
             },
             validator: {
-              initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n});\n\npubnub.addListener({\n  message: function(msg) {\n    receivedMsg = msg;\n  }\n});\n\npubnub.subscribe({channels: ['` + subscribeChannel + `']});`,
+              initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n
+                  });\n\npubnub.addListener({\n  message: function(msg) {\n    receivedMsg = msg;\n  }\n
+                  });\n\npubnub.subscribe({channels: ['${subscribeChannel}']});`,
               editableScript: `pubnub.setFilterExpression("");`,
             },
             testHandler: (script) => {
               window.pubnub = {};
 
               window.pubnub.setFilterExpression = (expression) => {
-                window.pubnub.filterExpression = expression
-              }
+                window.pubnub.filterExpression = expression;
+              };
 
               eval(script);
 
-              return (
-                window.pubnub.filterExpression === filterExpression
-              );
+              return window.pubnub.filterExpression === filterExpression;
             },
           },
           {
             title: "Level 4: Authorization",
             puzzle: {
-              question: `<p>There is an island with cannibals, who always lie, explorers, who always tell the truth and pirates, who can be honest or dishonest.</p>
+              question: `<p>There is an island with cannibals, who always lie, explorers, who always tell the truth and pirates,
+                who can be honest or dishonest.</p>
                 <p>On the island you are approached by three men. One wears blue, one wears red, and one wears green.</p>
                 <p>You know that one is a cannibal, one is an explorer and the other one is a pirate.</p>
                 <p>The man in red says, "I am a cannibal."</p>
@@ -271,14 +276,13 @@
                 <p>What are the true identities of these three men?</p>`,
               answers: ["Red: Pirate, Blue: Explorer, Green: Cannibal"],
               solution: "Red: Pirate, Blue: Explorer, Green: Cannibal",
-              clue:
-                "You need to use the authorization token for operator B. Provide the correct auth token in your code on the right to apply the correct authorization permissions to your PubNub client!",
+              clue: `You need to use the authorization token for operator B. Provide the correct auth token in your code on the
+                right to apply the correct authorization permissions to your PubNub client!`,
             },
             validator: {
               initialScript: `import PubNub from 'pubnub';`,
               editableScript: `pubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo",\n  authKey: ""\n});`,
               testHandler: (script) => {
-
                 // pubnub.grant({
                 //   channels: [publishChannel],
                 //   authKeys: [correctAuthToken],
@@ -296,7 +300,7 @@
                 // });
                 window.pubnub = {};
                 eval(script);
-                return (window.pubnub.authKey === correctAuthToken);
+                return window.pubnub.authKey === correctAuthToken;
               },
             },
           },
@@ -310,10 +314,15 @@
               answers: ["5", "8", "11", "15"],
               solution: "11",
               clue:
-                "The channel you need to retrieve history from is channel \"" + historyChannel + "\". Fetch historical PubNub messages in your code on the right using this channel name!",
+                'The channel you need to retrieve history from is channel "' +
+                historyChannel +
+                '". Fetch historical PubNub messages in your code on the right using this channel name!',
             },
             validator: {
-              initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n  authKey: "` + correctAuthToken + `"\n})`,
+              initialScript:
+                `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n  authKey: "` +
+                correctAuthToken +
+                `"\n})`,
               editableScript: `pubnub.fetchMessages({\n  channels: [""], count: 1\n});`,
               testHandler: () => {},
             },
@@ -321,7 +330,11 @@
           {
             title: "Level 6: Publish",
             puzzle: {
-              question: `<p>There are five houses sitting next to each other on a neighborhood street. Each house's owner is of a different nationality. Each house has different colored walls. Each house's owner drinks their own specific beverage, smokes their own brand of cigar, and keeps a certain type of pet. None of the houses share any of these variables—nationality, wall color, beverage, cigar, and pet—they are all unique.</p><ul>
+              question: `<p>There are five houses sitting next to each other on a neighborhood street.
+                Each house's owner is of a different nationality. Each house has different colored walls.
+                Each house's owner drinks their own specific beverage, smokes their own brand of cigar,
+                and keeps a certain type of pet. None of the houses share any of these variables—nationality,
+                wall color, beverage, cigar, and pet—they are all unique.</p><ul>
                 <ul>
                   <li>The Englishman lives in the house with red walls.The Swede keeps dogs.</li>
                   <li>The Dane drinks tea.</li>
@@ -342,10 +355,15 @@
               answers: ["House 1", "House 2", "House 3", "House 4", "House 5"],
               solution: "House 4",
               clue:
-                "You need to publish your SOS to channel \"" + publishChannel + "\". Publish your first PubNub message containing the island coordinates to this channel in your code on the right!",
+                'You need to publish your SOS to channel "' +
+                publishChannel +
+                '". Publish your first PubNub message containing the island coordinates to this channel in your code on the right!',
             },
             validator: {
-              initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n  authKey: "` + correctAuthToken + `"\n})`,
+              initialScript:
+                `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n  authKey: "` +
+                correctAuthToken +
+                `"\n})`,
               editableScript: `pubnub.publish({\n  channel: "",\n  message: {\n    sos: "Send Help!",\n    coordinates: "" \n  }\n});`,
               testHandler: () => {},
             },
