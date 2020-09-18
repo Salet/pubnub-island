@@ -255,9 +255,9 @@
                 '". Filter PubNub messages in your code on the right with this expression!',
             },
             validator: {
-              initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n
-                  });\n\npubnub.addListener({\n  message: function(msg) {\n    receivedMsg = msg;\n  }\n
-                  });\n\npubnub.subscribe({channels: ['${subscribeChannel}']});`,
+              initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n});
+                \npubnub.addListener({\n  message: function(msg) {\n    receivedMsg = msg;\n  }\n});
+                \npubnub.subscribe({channels: ['${subscribeChannel}']});`,
               editableScript: `pubnub.setFilterExpression("");`,
             },
             testHandler: (script) => {
