@@ -156,6 +156,10 @@
               editableScript: `pubnub = new PubNub({\n  publishKey: "",\n  subscribeKey: ""\n});`,
             },
             testHandler: (script) => {
+              window.PubNub = function(obj) {
+                this.publishKey = obj.publishKey;
+                this.subscribeKey = obj.subscribeKey;
+              };
               window.pubnub = {};
               eval(script);
               return (
