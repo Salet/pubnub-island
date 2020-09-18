@@ -1,16 +1,33 @@
 <template>
   <div id="app">
     <main>
-      <Header
-        :title="levels[currentLevel].title"
-        :description="levels[currentLevel].description"
+      <!--Toolbar-->
+      <Toolbar v-if="screen !== 'start'"/>
+
+      <!--Start Screen-->
+      <article id="startScreen" v-if="screen === 'start'">
+        <img src="@/assets/img/pubnublogo.png">
+        <button @click="screen = 'help'">Instructions</button>
+        <button @click="screen = 'game'">Begin!</button>
+      </article>
+
+      <!--Instructions-->
+      <Help v-if="screen === 'help'"
+        :helpText="helpText"
       />
-      <!-- <section v-if="levels[currentLevel].puzzle"> -->
-      <section>
-        <Puzzle />
-        <Answer />
-      </section>
-      <button @click="currentLevel++">Next ></button>
+
+      <!--Main Game-->
+      <article v-if="screen === 'game'">
+        <Header
+          :title="levels[currentLevel].title"
+          :description="levels[currentLevel].description"
+        />
+        <section>
+          <Puzzle />
+          <Answer />
+        </section>
+        <button id="nextButton" @click="[currentLevel++]">Next ></button>
+      </article>
     </main>
   </div>
 </template>
@@ -19,6 +36,8 @@
   import Header from "./components/Header.vue";
   import Puzzle from "./components/Puzzle.vue";
   import Answer from "./components/Answer.vue";
+  import Toolbar from "./components/Toolbar.vue";
+  import Help from "./components/Help.vue";
 
   export default {
     name: "App",
@@ -26,10 +45,18 @@
       Header,
       Puzzle,
       Answer,
+      Toolbar,
+      Help
     },
     data: function() {
       return {
+        screen: "start",
         currentLevel: 0,
+        helpText: `You awake, the lone survivor of a shipwreck on a mysterious island. After searching the island you discover a now abandoned communications system. If you can figure out how to work the system you just might be able to signal for help.
+
+         You've got access to the communications handbook but are missing certain configuration parameters. Luckily it seems the old system operators have hidden the necessary configuration through a series of puzzles.
+
+         To escape the island you need to crack the puzzles, correctly operate the communications system and broadcast your SOS message!`,
         levels: [
           {
             title: "Welcome to PubNub Island!",
@@ -81,7 +108,7 @@
   }
 
   body {
-    background-image: url("assets/bg.png");
+    background-image: url("assets/img/bg.png");
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center center;
@@ -118,7 +145,7 @@
   }
 
   main {
-    margin: 50px auto;
+    margin: 0px auto;
     max-width: 1200px;
     text-align: left;
   }
@@ -140,7 +167,24 @@
     color: white;
     cursor: pointer;
     padding: 20px 30px;
-    margin-top: 20px;
+    margin-top: 0px;
+  }
+
+  #startScreen {
+    text-align: center;
+  }
+
+  #startScreen img {
+    margin: auto;
+    display: block;
+    max-width: 50%;
+  }
+
+  #startScreen button {
+    margin: 20px 10px
+  }
+
+  #nextButton {
     float: right;
   }
 </style>

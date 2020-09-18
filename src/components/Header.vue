@@ -1,6 +1,6 @@
 <template>
   <div class="box">
-    <img src="@/assets/parrot.svg" />
+    <img src="@/assets/img/parrot.svg" />
     <h1>{{ title }}</h1>
     <p>{{ description }}</p>
   </div>
@@ -20,6 +20,7 @@
   .box {
     padding-left: 120px;
     position: relative;
+    margin-top:50px;
     margin-bottom: 20px;
   }
 
