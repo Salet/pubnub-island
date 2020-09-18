@@ -26,7 +26,10 @@
       <!--Main Game-->
       <article v-if="screen === 'game'">
         <Header :title="level.title" :description="level.description" />
-        <IncomingMessage v-if="level.previousResult" :incomingMessages="level.previousResult"/>
+        <IncomingMessage
+          v-if="level.previousResult"
+          :incomingMessages="level.previousResult"
+        />
         <section v-if="level.validator" id="gamearea">
           <Puzzle v-if="level.puzzle" :puzzle="level.puzzle" />
           <Validator
@@ -116,7 +119,7 @@
       },
     },
     data: function() {
-      let generateAuthToken = () => uuidv4().substring(0,10);
+      let generateAuthToken = () => uuidv4().substring(0, 10);
       let subscribeChannel = uuidv4();
       let correctAuthToken = generateAuthToken();
       let historyChannel = uuidv4();
@@ -127,8 +130,8 @@
       return {
         screen: "start",
         currentLevel: 0,
-        unlockLevel: 10,
-        canProgress: true,
+        unlockLevel: 0,
+        canProgress: false,
         result: null,
         helpText: `<p>You awake, the lone survivor of a shipwreck on a mysterious island.
           After searching the island you discover an abandoned communications system.
@@ -228,7 +231,7 @@
           },
           {
             title: "Level 3: Filtering messages",
-            previousResult: "ALL AUTH TOKENS{ \"key\": \"value\" }",
+            previousResult: 'ALL AUTH TOKENS{ "key": "value" }',
             description: `<p>Success! You can now receive inbound communications! It seems that not all the authorization
               tokens are valid however. It's possible to filter out the invalid codes if you can get Pubba to help.</p>
               <p>Looks like its time for another puzzle!</p>`,
@@ -271,7 +274,14 @@
           },
           {
             title: "Level 4: Authorization",
-            previousResult: "{ \"operatorA\": \"" + generateAuthToken() + "\",\"operatorB\": \"" + correctAuthToken +"\",\"operatorC\": \"" + generateAuthToken() + "\" }",
+            previousResult:
+              '{ "operatorA": "' +
+              generateAuthToken() +
+              '","operatorB": "' +
+              correctAuthToken +
+              '","operatorC": "' +
+              generateAuthToken() +
+              '" }',
             puzzle: {
               question: `<p>There is an island with cannibals, who always lie, explorers, who always tell the truth and pirates,
                 who can be honest or dishonest.</p>
@@ -336,7 +346,10 @@
           },
           {
             title: "Level 6: Publish",
-            previousResult: "{ \"dailyReport\": \"Weather is still hot at " + coordinates + ".\" }",
+            previousResult:
+              '{ "dailyReport": "Weather is still hot at ' +
+              coordinates +
+              '." }',
             puzzle: {
               question: `<p>There are five houses sitting next to each other on a neighborhood street.
                 Each house's owner is of a different nationality. Each house has different colored walls.
