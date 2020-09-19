@@ -3,7 +3,7 @@
     <h1>PubNub Island</h1>
     <div v-html="helpText" />
     <section>
-      <button @click="handleCloseClick">Begin!</button>
+      <button @click="handleCloseClick">{{gameStarted ? "Return to game" : "Start game!"}}</button>
     </section>
   </div>
 </template>

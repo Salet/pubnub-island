@@ -1,6 +1,6 @@
 <template>
   <div class="box">
-    <h3>Your quest:</h3>
+    <h3>Pubba's puzzle:</h3>
     <div v-if="!correct">
       <p v-html="puzzle.question" />
       <section>
