@@ -86,8 +86,8 @@
   import Help from "./components/Help.vue";
   // import PubNub from "pubnub";
 
-  //TODO copy and paste clues
-  //TODO when you get to the end and click play again it doesn't reset checks
+  // TODO The ability to copy clues to your clipboard on click
+  // TODO favicon
 
   export default {
     name: "App",
@@ -122,7 +122,12 @@
         this.screen = "start";
       },
       validateScript: function(script) {
-        this.result = this.level.testHandler(script);
+        try {
+          this.result = this.level.testHandler(script);
+        } catch (e) {
+          this.result = false;
+          console.log("Player code caused an error", e);
+        }
         if (this.result) this.enableNextLevel();
       },
       enableNextLevel: function() {
@@ -161,7 +166,7 @@
       let historyChannel = uuidv4();
       let publishChannel = uuidv4();
       let coordinates = "37°46'56.2\"N 122°23'43.1\"W";
-      let historyMessage = {dailyReport: "Weather is still hot at " + coordinates + "."};
+      let historyMessage = {dailyReport: "Weather is still hot at " + coordinates + " sun protection advised!"};
 
       return {
         screen: "start",
@@ -263,7 +268,7 @@
               // });
               window.pubnub = {
                 subscribe: (obj) => {
-                  window.pubnub.subscribeChannels = obj.channels;
+                  window.subscribeChannels = obj.channels;
                 }
               };
 
