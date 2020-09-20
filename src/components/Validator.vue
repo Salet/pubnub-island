@@ -1,6 +1,6 @@
 <template>
   <div class="box">
-    <h3>Use your new skills here:</h3>
+    <h3>Use the clue here:</h3>
     <pre v-if="validator.initialScript">{{ validator.initialScript }}</pre>
     <textarea v-model="value"></textarea>
     <div id="clue" v-html="clue" :class="result ? 'good' : 'bad'"></div>

@@ -10,8 +10,7 @@
 
       <!--Start Screen-->
       <article id="startScreen" v-if="screen === 'start'">
-        <img src="@/assets/img/pubnublogo.png" alt="Game Logo" />
-        <h1>Island</h1>
+        <img src="@/assets/img/logo.png" alt="Game Logo" />
         <button @click="screen = 'help'">Help</button>
         <button @click="screen = 'game'">Begin!</button>
       </article>
@@ -66,10 +65,12 @@
 
       <!--End Screen-->
       <article id="endScreen" v-if="screen === 'end'">
-        <img src="@/assets/img/pubnublogo.png" alt="Game Logo" />
-        <h1>Island</h1>
+        <img src="@/assets/img/logo.png" alt="Game Logo" />
         <h3>You successfully sent your SOS. Help is on the way!</h3>
-        <h3>Fancy something a little easier? Get started with your <a href="https://www.pubnub.com/docs">first PubNub app!</a></h3>
+        <h3>
+          Fancy something a little easier? Get started with your
+          <a href="https://www.pubnub.com/docs">first PubNub app!</a>
+        </h3>
         <button @click="quitGame">Play again?</button>
       </article>
     </main>
@@ -85,9 +86,6 @@
   import Toolbar from "./components/Toolbar.vue";
   import Help from "./components/Help.vue";
   // import PubNub from "pubnub";
-
-  // TODO The ability to copy clues to your clipboard on click
-  // TODO favicon
 
   export default {
     name: "App",
@@ -146,27 +144,30 @@
       let generateAuthSet = (correct, code) => {
         return {
           meta: {
-            code
+            code,
           },
           message: {
             operatorA: generateAuthToken(),
             operatorB: correct ? correctAuthToken : generateAuthToken(),
-            operatorC: generateAuthToken()
-          }
-        }
-      }
+            operatorC: generateAuthToken(),
+          },
+        };
+      };
       let filterExpression = "LOBSTER";
       let filteredAuth = generateAuthSet(true, filterExpression);
       let allAuths = [
         generateAuthSet(false, "CRAB"),
         filteredAuth,
-        generateAuthSet(false, "TUNA")
-      ]
+        generateAuthSet(false, "TUNA"),
+      ];
       let subscribeChannel = uuidv4();
       let historyChannel = uuidv4();
       let publishChannel = uuidv4();
       let coordinates = "37°46'56.2\"N 122°23'43.1\"W";
-      let historyMessage = {dailyReport: "Weather is still hot at " + coordinates + " sun protection advised!"};
+      let historyMessage = {
+        dailyReport:
+          "Weather is still hot at " + coordinates + " sun protection advised!",
+      };
 
       return {
         screen: "start",
@@ -199,6 +200,7 @@
               solution: "5min",
               clue:
                 "Your PubNub keyset is demo/demo. Initialize your object with those keys to start working with PubNub right away!",
+              copyString: "demo",
             },
             validator: {
               initialScript: `import PubNub from pubnub;`,
@@ -237,6 +239,7 @@
               solution: "1",
               clue: `You need to subscribe to channel "${subscribeChannel}". Use this channel name in the code on the
                 right to start receiving PubNub messages!`,
+              copyString: subscribeChannel,
             },
             validator: {
               initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n})
@@ -269,12 +272,15 @@
               window.pubnub = {
                 subscribe: (obj) => {
                   window.subscribeChannels = obj.channels;
-                }
+                },
               };
 
               eval(script);
 
-              return window.subscribeChannels.length === 1 && window.subscribeChannels[0] === subscribeChannel;
+              return (
+                window.subscribeChannels.length === 1 &&
+                window.subscribeChannels[0] === subscribeChannel
+              );
             },
           },
           {
@@ -285,7 +291,8 @@
               <p>Looks like its time for another puzzle!</p>`,
             onComplete: `Woo! To learn how to use PubNub's stream filtering once you're back to safety, visit
               <a href="https://www.pubnub.com/docs" target="_blank">www.pubnub.com/docs</a>!`,
-            onFail: "Hmm that doesn't look right. Your filter expression should be of the form \"code == ANIMAL\"",
+            onFail:
+              'Hmm that doesn\'t look right. Your filter expression should be of the form "code == ANIMAL"',
             puzzle: {
               question: `<p>Adam and Eve play rock-paper-scissors 10 times. You know that:</p>
                 <ul>
@@ -297,8 +304,8 @@
                 <p>Who wins and by how much?</p>`,
               answers: ["Adam 6-4", "Eve 6-4", "Adam 7-3", "Eve 7-3"],
               solution: "Adam 7-3",
-              clue:
-                `The filter expression you need is "${filterExpression}". Filter PubNub messages in your code on the right with this expression!`,
+              clue: `The filter expression you need is "${filterExpression}". Filter PubNub messages in your code on the right with this expression!`,
+              copyString: filterExpression,
             },
             validator: {
               initialScript: `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n});
@@ -310,12 +317,14 @@
               window.pubnub = {
                 setFilterExpression: (expression) => {
                   window.pubnub.filterExpression = expression;
-                }
+                },
               };
 
               eval(script);
 
-              return window.pubnub.filterExpression === "code == " + filterExpression;
+              return (
+                window.pubnub.filterExpression === "code == " + filterExpression
+              );
             },
           },
           {
@@ -325,7 +334,8 @@
               <p>You'll need to solve another puzzle to determine which operator code to use!</p>`,
             onComplete: `Great job! To learn how to use PubNub's Access Manager once you're back to safety, visit
               <a href="https://www.pubnub.com/docs" target="_blank">www.pubnub.com/docs</a>!`,
-            onFail: "Hmm that doesn't look right. Only one of the operator's auth tokens are valid. Solve the puzzle to work out which!",
+            onFail:
+              "Hmm that doesn't look right. Only one of the operator's auth tokens are valid. Solve the puzzle to work out which!",
             previousResult: JSON.stringify(filteredAuth, null, 2),
             puzzle: {
               question: `<p>There is an island with cannibals, who always lie, explorers, who always tell the truth and pirates,
@@ -342,19 +352,20 @@
                 "Red: Pirate, Blue: Explorer, Green: Cannibal",
                 "Red: Explorer, Blue: Cannibal, Green: Pirate",
                 "Red: Cannibal, Blue: Pirate, Green: Explorer",
-                "Red: Pirate, Blue: Cannibal, Green: Explorer"
+                "Red: Pirate, Blue: Cannibal, Green: Explorer",
               ],
               solution: "Red: Pirate, Blue: Explorer, Green: Cannibal",
               clue: `You need to use the authorization token for operator B. Provide the correct auth token in your code on the
                 right to apply the correct authorization permissions to your PubNub client!`,
+              copyString: filteredAuth.message.operatorB,
             },
             validator: {
               initialScript: `import PubNub from 'pubnub';`,
-              editableScript: `pubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo",\n  authKey: ""\n});`
+              editableScript: `pubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo",\n  authKey: ""\n});`,
             },
             testHandler: (script) => {
               window.PubNub = function(obj) {
-                this.authKey = obj.authKey
+                this.authKey = obj.authKey;
               };
               // pubnub.grant({
               //   channels: [publishChannel],
@@ -383,7 +394,8 @@
               <p>If you are able to solve the next puzzle, Pubba will let you know the channel name they used.</p>`,
             onComplete: `Good work! To learn how to PubNub's history features once you're back to safety, visit
               <a href="https://www.pubnub.com/docs" target="_blank">www.pubnub.com/docs</a>!`,
-            onFail: "Hmm that doesn't look right. You need to fetch just one message from the correct channel!",
+            onFail:
+              "Hmm that doesn't look right. You need to fetch just one message from the correct channel!",
             puzzle: {
               question: `<p>Susan and Lisa decided to play volleyball against each other.</p>
                 <p>They bet 1 coconut on each game they played.</p>
@@ -395,25 +407,28 @@
                 'The channel you need to retrieve history from is channel "' +
                 historyChannel +
                 '". Fetch historical PubNub messages in your code on the right using this channel name!',
+              copyString: historyChannel,
             },
             validator: {
               initialScript:
                 `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n  authKey: "` +
                 correctAuthToken +
                 `"\n})`,
-              editableScript: `pubnub.fetchMessages({\n  channels: [""],\n  count: 1\n});`
+              editableScript: `pubnub.fetchMessages({\n  channels: [""],\n  count: 1\n});`,
             },
             testHandler: (script) => {
               window.pubnub = {
                 fetchMessages: (obj) => {
                   window.fetchChannels = obj.channels;
                   window.fetchCount = obj.count;
-                }
-              }
+                },
+              };
               eval(script);
-              return window.fetchChannels.length === 1
-                && window.fetchChannels[0] === historyChannel
-                && window.fetchCount === 1;
+              return (
+                window.fetchChannels.length === 1 &&
+                window.fetchChannels[0] === historyChannel &&
+                window.fetchCount === 1
+              );
             },
           },
           {
@@ -423,7 +438,8 @@
               <p>It looks like you'll need Pubba to help one last time. This puzzle isn't going to be easy!</p>`,
             onComplete: `Superb! To learn more about to PubNub's realtime publish and subscribe functionality once you're back to safety, visit
               <a href="https://www.pubnub.com/docs" target="_blank">www.pubnub.com/docs</a>!`,
-            onFail: "Hmm that doesn't look right. You need to publish the island's coordinates to the correct channel. Solve the puzzle and check your formatting!",
+            onFail:
+              "Hmm that doesn't look right. You need to publish the island's coordinates to the correct channel. Solve the puzzle and check your formatting!",
             previousResult: JSON.stringify(historyMessage, null, 2),
             puzzle: {
               question: `<p>There are five houses sitting next to each other on a neighborhood street.
@@ -455,26 +471,29 @@
                 'You need to publish your SOS to channel "' +
                 publishChannel +
                 '". Publish your first PubNub message containing the island coordinates to this channel in your code on the right!',
+              copyString: publishChannel,
             },
             validator: {
               initialScript:
                 `import PubNub from 'pubnub';\n\npubnub = new PubNub({\n  publishKey: "demo",\n  subscribeKey: "demo"\n  authKey: "` +
                 correctAuthToken +
                 `"\n})`,
-              editableScript: `pubnub.publish({\n  channel: "",\n  message: {\n    sos: "Send help!",\n    coordinates: "" \n  }\n});`
+              editableScript: `pubnub.publish({\n  channel: "",\n  message: {\n    sos: "Send help!",\n    coordinates: "" \n  }\n});`,
             },
             testHandler: (script) => {
               window.pubnub = {
                 publish: (obj) => {
                   window.publishChannel = obj.channel;
                   window.publishMessage = obj.message;
-                }
-              }
+                },
+              };
               eval(script);
-              return window.publishChannel === publishChannel
-                && window.publishMessage
-                && window.publishMessage.sos === "Send help!"
-                && window.publishMessage.coordinates === coordinates;
+              return (
+                window.publishChannel === publishChannel &&
+                window.publishMessage &&
+                window.publishMessage.sos === "Send help!" &&
+                window.publishMessage.coordinates === coordinates
+              );
             },
           },
         ],
@@ -541,6 +560,10 @@
     text-align: center;
   }
 
+  a {
+    color: #2c3e50;
+  }
+
   main {
     margin: 0 auto;
     max-width: 1400px;
@@ -585,22 +608,38 @@
     background-color: #bbb;
   }
 
-  #startScreen, #endScreen {
-    padding-top: 30vh;
+  #startScreen,
+  #endScreen {
+    padding-top: 20vh;
     text-align: center;
   }
 
-  #startScreen img, #endScreen img {
-    margin: auto;
+  #startScreen img,
+  #endScreen img {
+    margin: 0 auto 35px;
     display: block;
     max-width: 30%;
   }
 
-  #startScreen button, #endScreen button {
+  #startScreen button,
+  #endScreen button {
     margin: 20px 10px;
   }
 
-  #previousButton, #nextButton {
+  #endScreen img {
+    margin: 0 auto 10px;
+  }
+
+  #endScreen h3 {
+    font-weight: 900;
+  }
+
+  #endScreen button {
+    margin: 35px 10px 0;
+  }
+
+  #previousButton,
+  #nextButton {
     margin: 20px 0 50px;
   }
 
