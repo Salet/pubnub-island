@@ -1,9 +1,11 @@
 <template>
   <div class="box">
-    <h1>PubNub Island</h1>
+    <h1>PubNub Castaway Island</h1>
     <div v-html="helpText" />
     <section>
-      <button @click="handleCloseClick">{{gameStarted ? "Return to game" : "Start game!"}}</button>
+      <button @click="handleCloseClick">
+        {{ gameStarted ? "Return to game" : "Start game!" }}
+      </button>
     </section>
   </div>
 </template>
@@ -13,7 +15,7 @@
     name: "Help",
     props: {
       helpText: String,
-      gameStarted: Boolean
+      gameStarted: Boolean,
     },
     methods: {
       handleCloseClick: function() {

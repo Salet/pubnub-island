@@ -10,7 +10,7 @@
 
       <!--Start Screen-->
       <article id="startScreen" v-if="screen === 'start'">
-        <img src="@/assets/img/island4.png" alt="Game Logo" />
+        <img src="@/assets/img/island4.png" alt="Game Logo" class="logo" />
         <button @click="screen = 'help'">Help</button>
         <button @click="screen = 'game'">Begin!</button>
       </article>
@@ -65,7 +65,7 @@
 
       <!--End Screen-->
       <article id="endScreen" v-if="screen === 'end'">
-        <img src="@/assets/img/island4.png" alt="Game Logo" />
+        <img src="@/assets/img/island4.png" alt="Game Logo" class="logo" />
         <h3>You successfully sent your SOS. Help is on the way!</h3>
         <h3>
           Fancy something a little easier? Get started with your
@@ -619,6 +619,10 @@
     margin: 0 auto 35px;
     display: block;
     max-width: 30%;
+    -webkit-filter: drop-shadow(2px 2px 0 white) drop-shadow(-2px 2px 0 white)
+      drop-shadow(2px -2px 0 white) drop-shadow(-2px -2px 0 white);
+    filter: drop-shadow(2px 2px 0 white) drop-shadow(-2px 2px 0 white)
+      drop-shadow(2px -2px 0 white) drop-shadow(-2px -2px 0 white);
   }
 
   #startScreen button,
