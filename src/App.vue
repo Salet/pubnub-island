@@ -10,7 +10,7 @@
 
       <!--Start Screen-->
       <article id="startScreen" v-if="screen === 'start'">
-        <img src="@/assets/img/logo.png" alt="Game Logo" />
+        <img src="@/assets/img/island4.png" alt="Game Logo" />
         <button @click="screen = 'help'">Help</button>
         <button @click="screen = 'game'">Begin!</button>
       </article>
@@ -65,7 +65,7 @@
 
       <!--End Screen-->
       <article id="endScreen" v-if="screen === 'end'">
-        <img src="@/assets/img/logo.png" alt="Game Logo" />
+        <img src="@/assets/img/island4.png" alt="Game Logo" />
         <h3>You successfully sent your SOS. Help is on the way!</h3>
         <h3>
           Fancy something a little easier? Get started with your
